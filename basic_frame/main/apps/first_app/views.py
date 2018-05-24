@@ -16,7 +16,7 @@ def index(request):
         request.session['initial'] = True #initialize default values for session to avoid checking if they are in later
         request.session['user_id'] = -1 #on login makes a different user id
         request.session['create'] = False #turns true on successful registration
-    return render(request, "django_app/code.html")
+    return render(request, "django_app/registration.html")
 
 def login_page(request):
     if 'initial' in request.session: #reinitializes on login redirect. clearing the cookie will end up here again
@@ -75,7 +75,7 @@ def create(request): #user registration
             request.session['create'] = True
             request.session['user_id'] = user_id
             print('CREATED::', user)
-            return redirect("/quotes")
+            return redirect("/graphs")
     else:
         return redirect('/')
 
@@ -90,7 +90,7 @@ def show(request, id): #success page
                     'quotes' : this_user.quotes.all() 
                    }
         request.session['first_name'] = this_user.fname
-        return render(request,"django_app/user.html", context)
+        return render(request,"django_app/user_graphs.html", context)
     else: #user is not here
         messages.add_message(request, 0, 'you must log in')
         return redirect('/users/login_page')
@@ -150,7 +150,7 @@ def dashboard(request):
         'allquotes' : quotes.objects.all(),
         'user' : users.objects.get(id = str(user_id))
     }
-    return render(request, "django_app/quote_dashboard.html", context)
+    return render(request, "django_app/coin_graphs_homepage.html", context)
 
 def addquote(request,user_id):
     if request.method == "POST":
@@ -166,22 +166,22 @@ def addquote(request,user_id):
                 print(key,value,category)
                 messages.add_message(request, category, value)
             print('ERROR::',errors)
-            return redirect('/quotes')
+            return redirect('/graphs')
         else: #create quote
             poster = users.objects.get(id = user_id)
             print(poster)
             this_quote = quotes.objects.create(quotee = request.POST['quotee'], quote = request.POST['quote'], poster = poster) #poster likes his own posts automatically
-            return redirect('/quotes')
+            return redirect('/graphs')
     else:
-        return redirect('/quotes')
+        return redirect('/graphs')
 
 def delquote(request,quote_id):
     if request.method == 'POST':
         kill_quote = quotes.objects.get(id = quote_id)
         kill_quote.delete()
-        return redirect('/quotes')
+        return redirect('/graphs')
     else:
-        return redirect('/quotes')
+        return redirect('/graphs')
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
@@ -191,7 +191,7 @@ def like(request,user_id,quote_id):
         print('QUOTE::', this_quote)
         if len(this_user.likes.filter(id = quote_id))> 0:
             #user has liked this post already
-            return redirect('/quotes')
+            return redirect('/graphs')
         else:
             #add the post to likes
             print('BEFORE::',this_quote.users_liked)
@@ -199,9 +199,15 @@ def like(request,user_id,quote_id):
             print('AFTER::',this_quote.users_liked)
             #redirect to quote poster page
             return redirect('/users/'+str(this_quote.poster.id))
-        return redirect('/quotes')
+        return redirect('/graphs')
     else:
-        return redirect('/quotes')
+        return redirect('/graphs')
+
+def graph_interface(request,user_id):
+    context = {
+        "user_id" : user_id
+    }
+    return render(request, 'django_app/create_graph.html', context)
 
 def logout(request):
     request.session.clear()

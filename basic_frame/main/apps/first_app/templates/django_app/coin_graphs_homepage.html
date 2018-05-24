@@ -19,7 +19,7 @@
         <div class='allquotes'>
             <h3>Quotes</h3>
             {% for quote in allquotes %}
-            <form class= 'quote' method = 'post' action = '/quotes/like/{{user.id}}/{{quote.id}}'>
+            <form class= 'quote' method = 'post' action = '/graphs/like/{{user.id}}/{{quote.id}}'>
                 {% csrf_token %}
                 <p>{{quote.quotee}} : "{{quote.quote}}" </p>
                 <p>Posted by <a href = 'users/{{quote.poster.id}}'>{{quote.poster.fname}}</a></p>
@@ -27,14 +27,14 @@
                 <button class = 'logout'>Like!</button>
             </form>
             {% if user.id == quote.poster.id %}
-            <form method = 'post' action = '/quotes/delete/{{quote.id}}'>
+            <form method = 'post' action = '/graphs/delete/{{quote.id}}'>
                 {% csrf_token %}
                 <button>Delete Your Graph Above</button>
             </form>
             {% endif %}
             {% endfor %}
         </div>
-        <form class = 'addquote' method = 'post' action = '/quotes/add/{{user.id}}'>
+        <form class = 'addquote' method = 'post' action = '/graphs/add/{{user.id}}'>
             {% csrf_token %}
             <h3>Add a Quote!</h3>
             <p>Author:</p>
