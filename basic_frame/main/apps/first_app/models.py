@@ -86,11 +86,12 @@ class users(models.Model):
     def __repr__(self):
         return "<user object: name: {} {} email: {}".format(self.fname, self.lname, self.email)
 
-class quotes(models.Model):
-    quotee = models.CharField(max_length=255)
-    quote = models.CharField(max_length=255)
-    poster = models.ForeignKey(users, related_name = "quotes")
-    users_liked = models.ManyToManyField(users, related_name = "likes")
+class coin(models.Model):
+    requestID = models.IntegerField() #ID for requesting the API
+    name = models.CharField(max_length=255)
+    symbol = models.CharField(max_length = 255)
+    price = models.DecimalField(max_digits=14,decimal_places=2) #in USD
+    timestamp = models.BigIntegerField() #timestamp from API located in metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = quoteManager()

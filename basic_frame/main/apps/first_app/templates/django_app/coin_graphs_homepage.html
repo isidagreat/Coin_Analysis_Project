@@ -16,45 +16,8 @@
             <a href = '/users/logout'><button class = 'logout'>Logout</button></a>
         </div>
         <p>This page will be given all the coins we have on database and display the historical data for the coins. For advanced the user should be able to choose coins to follow or unfollow for analysis. For advanced the graphs will be interactive and allow the user to see datapoints and prices when they move their mouse over the graph screen. There should be a button that leads to my graphs and you should be able to click on the coins to go to the homepage.</p>
-        <div class='allquotes'>
-            <h3>Quotes</h3>
-            {% for quote in allquotes %}
-            <form class= 'quote' method = 'post' action = '/graphs/like/{{user.id}}/{{quote.id}}'>
-                {% csrf_token %}
-                <p>{{quote.quotee}} : "{{quote.quote}}" </p>
-                <p>Posted by <a href = 'users/{{quote.poster.id}}'>{{quote.poster.fname}}</a></p>
-                <p>{{quote.users_liked.count}} people like this</p>
-                <button class = 'logout'>Like!</button>
-            </form>
-            {% if user.id == quote.poster.id %}
-            <form method = 'post' action = '/graphs/delete/{{quote.id}}'>
-                {% csrf_token %}
-                <button>Delete Your Graph Above</button>
-            </form>
-            {% endif %}
-            {% endfor %}
+        <p></p>
         </div>
-        <form class = 'addquote' method = 'post' action = '/graphs/add/{{user.id}}'>
-            {% csrf_token %}
-            <h3>Add a Quote!</h3>
-            <p>Author:</p>
-            {% if messages %}
-            {% for msg in messages %}
-            {% if msg.level == 1 %}
-            <h6>{{msg}}</h6>
-            {% endif %}
-            {% endfor %} {% endif %} 
-            <input type = 'text' name = 'quotee'>
-            <p>Quote:</p>
-            {% if messages %}
-            {% for msg in messages %}
-            {% if msg.level == 2 %}
-            <h6>{{msg}}</h6>
-            {% endif %}
-            {% endfor %} {% endif %} 
-            <input type = 'textarea' name = 'quote' class = 'area'>
-            <button class = 'logout'>Submit</button>
-        </form>
     </div>
 </body>
 

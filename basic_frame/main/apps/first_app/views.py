@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
 from datetime import date, datetime
-from .models import users, quotes
+from .models import users
 from django.contrib import messages
 import bcrypt
 
@@ -154,51 +154,35 @@ def dashboard(request):
 
 def addquote(request,user_id):
     if request.method == "POST":
-        errors = quotes.objects.quote_validator(request.POST)
-        category=0
-        key_prev = 'j'
-        if len(errors):
-            for key,value in errors.items():
-                messages.set_level(request,category) #otherwise will ignore add message
-                if key_prev != key: #allows for multiple errors to display over one box
-                    key_prev = key
-                    category += 1
-                print(key,value,category)
-                messages.add_message(request, category, value)
-            print('ERROR::',errors)
-            return redirect('/graphs')
-        else: #create quote
-            poster = users.objects.get(id = user_id)
-            print(poster)
-            this_quote = quotes.objects.create(quotee = request.POST['quotee'], quote = request.POST['quote'], poster = poster) #poster likes his own posts automatically
-            return redirect('/graphs')
+        # errors = quotes.objects.quote_validator(request.POST)
+        # category=0
+        # key_prev = 'j'
+        # if len(errors):
+        #     for key,value in errors.items():
+        #         messages.set_level(request,category) #otherwise will ignore add message
+        #         if key_prev != key: #allows for multiple errors to display over one box
+        #             key_prev = key
+        #             category += 1
+        #         print(key,value,category)
+        #         messages.add_message(request, category, value)
+        #     print('ERROR::',errors)
+        return redirect('/graphs')
+        # else: #create quote
+        #     # poster = users.objects.get(id = user_id)
+        #     # print(poster)
+        #     # this_quote = quotes.objects.create(quotee = request.POST['quotee'], quote = request.POST['quote'], poster = poster) #poster likes his own posts automatically
+        #     return redirect('/graphs')
     else:
         return redirect('/graphs')
 
 def delquote(request,quote_id):
     if request.method == 'POST':
-        kill_quote = quotes.objects.get(id = quote_id)
-        kill_quote.delete()
         return redirect('/graphs')
     else:
         return redirect('/graphs')
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
-        this_user = users.objects.get(id = user_id)
-        print('USER::', this_user)
-        this_quote = quotes.objects.get(id = quote_id)
-        print('QUOTE::', this_quote)
-        if len(this_user.likes.filter(id = quote_id))> 0:
-            #user has liked this post already
-            return redirect('/graphs')
-        else:
-            #add the post to likes
-            print('BEFORE::',this_quote.users_liked)
-            this_quote.users_liked.add(this_user)
-            print('AFTER::',this_quote.users_liked)
-            #redirect to quote poster page
-            return redirect('/users/'+str(this_quote.poster.id))
         return redirect('/graphs')
     else:
         return redirect('/graphs')
