@@ -1,0 +1,37 @@
+<html>
+
+<head>
+    {% load static %}
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
+</head>
+
+<body>
+    <div class='wrapper'>
+        <h2>Login Here</h2>
+        <p>This page should be given more style. As a team we should decide on a distinctive style associated with this app.</p>
+        <form action='/users/login' class='login' method='POST'>
+        {% csrf_token %}    
+            <p>Email:</p>
+            <input type='text' name='email'>
+            {% if messages %}
+                {% for msg in messages %}
+                {% if msg.level == 1 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+            <p>Password:</p>
+            <input type='text' name='password'>
+            {% if messages %}
+                {% for msg in messages %}
+                {% if msg.level == 2 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+            <button class= 'logout' type = 'submit'>Log In</button>
+        </form>
+        <a href = '/'><button class = 'logout'>Create Account</button></a>
+    </div>
+</body>
+
+</html>

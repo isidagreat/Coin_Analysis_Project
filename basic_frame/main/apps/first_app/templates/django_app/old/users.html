@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Users</title>
+      {% load static %}
+      <link rel="stylesheet" href="{% static 'django_app\css\main.css' %}">
+    </head>
+    <body>
+        <div class = 'wrapper'>
+          <div class = 'table'>
+            <div class = 'col1'>
+              <h6>Full Name</h6>
+              {% for i in users %}
+              <p>{{i.fname}} {{i.lname}}</p>
+              {% endfor %}
+            </div>
+            <div class = 'col2'>
+              <h6>Email</h6>
+              {% for i in users %}
+              <p>{{i.email}}</p>
+              {% endfor %}
+            </div>
+            <div class = 'col3'>
+              <h6>Created At</h6>
+              {% for i in users %}
+              <p>{{i.created_at}}</p>
+              {% endfor %}
+            </div>
+            <div class = 'col4'>
+              <h6>Actions</h6>
+              {% for i in users %}
+              <p><a href = "/users/{{i.id}}">Show</a> <a href = "/users/{{i.id}}/edit">Edit</a> <a href = "/users/{{i.id}}/delete">Delete</a></p>
+              {% endfor %}
+            </div>
+          <!-- <select name = 'potato'>
+              <option class = 'mer' value = '0'>0</option>
+              <option class = 'mer' value = "1">1</option>
+              <option class = 'mer' value = "2">2</option>
+              <option class = 'mer' value = "3">3</option>
+            </select> -->
+          </div>
+          <a href = "/users/new">Add a new User</a>
+        </div>
+    </body>
+  </html>

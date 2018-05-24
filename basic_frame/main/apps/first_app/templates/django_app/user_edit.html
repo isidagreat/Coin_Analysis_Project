@@ -1,0 +1,59 @@
+<html>
+
+<head>
+    <title>Mellon</title>
+    {% load static %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
+</head>
+
+<body>
+    <div class='wrapper'>
+        <h3>Edit Your Account</h3>
+        <form action='/users/edit' method='POST'>
+            {% csrf_token %}
+            <p> This page should be given more functionality to allow linking to social media, as well as change password and delete account</p>
+            <div class='entry_field'>
+                <h5>First Name:</h5>
+                {% if messages %}
+                {% for msg in messages %}
+                {% if msg.level == 1 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='first_name' value = '{{first_name}}'>
+            </div>
+            <div class='entry_field'>
+                <h5>Last Name:</h5>
+                {% if messages %} 
+                {% for msg in messages %}
+                {% if msg.level == 2 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='last_name' value = '{{last_name}}'>
+            </div>
+            <div class='entry_field'>
+                <h5>Email:</h5>
+                {% if messages %} 
+                {% for msg in messages %}
+                {% if msg.level == 3 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='email' value = '{{email}}'>
+            </div>
+            <input type = 'hidden' name = 'id' value = '{{ID}}'>
+            <button type = 'submit' class = 'logout'>Update</button>
+        </form>
+        <form action='/users/logout'>
+            <button class='logout' type='submit'>Logout</button>
+        </form>
+        <form action='/users/{{ID}}'>
+            <button class='logout' type='submit'>Back to Your Page</button>
+        </form>
+    </div>
+    </div>
+</body>
+
+</html>

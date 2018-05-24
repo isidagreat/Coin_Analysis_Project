@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    {% load static %}
+    <title>Login and Registration</title>
+    <link rel="stylesheet" href="{% static 'django_app\css\styles.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class='wrapper'>
+        <p>This page should be given more style. We as a team should decide which style to give this page, as well as look at examples to see how other sites chose style.</p>
+        <h1>Login and Registration</h1>
+        <h3>Register Here!</h3>
+        <form action='/users/add' method='POST'>
+            {% csrf_token %}
+            <div class='entry_field'>
+                <h5>First Name:</h5>
+                {% if messages %}
+                {% for msg in messages %}
+                {% if msg.level == 1 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='first_name'>
+            </div>
+            <div class='entry_field'>
+                <h5>Last Name:</h5>
+                {% if messages %} 
+                {% for msg in messages %}
+                {% if msg.level == 2 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='last_name'>
+            </div>
+            <div class='entry_field'>
+                <h5>Email:</h5>
+                {% if messages %} 
+                {% for msg in messages %}
+                {% if msg.level == 3 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='email'>
+            </div>
+            <div class='entry_field'>
+                <h5>Password:</h5>
+                {% if messages %} 
+                {% for msg in messages %}
+                {% if msg.level == 4 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %}   
+                <input type='text' name='password'>
+            </div>
+            <div class='entry_field'>
+                <h5>Confirm Password:</h5>
+                {% if messages %} 
+                {% for msg in messages %}
+                {% if msg.level == 5 %}
+                <h6>{{msg}}</h6>
+                {% endif %}
+                {% endfor %} {% endif %} 
+                <input type='text' name='confirm'>
+            </div>
+            <button type = 'submit'>Register</button>
+        </form>
+        <form action = '/users/login'>
+            <button>Log In</button>
+        </form>
+        </div>
+</body>
+</html>

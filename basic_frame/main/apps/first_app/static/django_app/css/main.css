@@ -1,0 +1,85 @@
+/*This is a default CSS document*/
+*{
+    padding:0px;
+    margin:0px;
+    /* border:red dashed 1px; */
+}
+title{
+    font-size:30px;
+    background-color:gray;
+    padding:10px;
+    font-weight:bold;
+    padding-left:15px;
+}
+/*This is the start of the webpage*/
+.wrapper{
+    min-height:1000px;
+    min-width:1000px;
+    padding:10px;
+    background-color:silver;
+}
+    /*Define the classes below*/
+    .table{
+        display:block;
+        background-color:white;
+        border:solid black 3px;
+        height:400px;
+        width:1000px;
+    }
+        .table div h6{
+            background-color:gray;
+        }
+        .table div{
+            display:inline-block;
+            height:300px;
+            vertical-align:top;
+        }
+        .col1{
+            width:300px;
+            border-right:solid black 2px;
+        }
+        .col2{
+            width:150px;
+            border-right:solid black 2px;
+        }
+        .col3{
+            width:200px;
+            border-right:solid black 2px;
+        }
+            .mer{
+                display:block;
+                margin:auto;
+            }
+        .col4{
+            width:300px;
+        }
+            .col4 a{
+                display:inline-block;
+            }
+    .gen{
+        display:block;
+        margin:auto;
+        padding:5px;
+        background-color:lightblue;
+        border: solid black 2px;
+        margin-top:10px;
+    }
+    .line{
+        display:block;
+        width:300px;
+        height:35px;
+        border:black 1px solid;
+        margin:auto;
+    }
+        .line p{
+            vertical-align:top;
+            display:inline-block;
+            width:140px;
+            height:30px;
+        }
+        .line h6{
+            vertical-align:top;
+            display:inline-block;
+            width:140px;
+            height:30px;
+        }

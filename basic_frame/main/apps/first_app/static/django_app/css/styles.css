@@ -1,0 +1,77 @@
+/*This is a default CSS document*/
+*{
+    padding:0px;
+    margin:0px;
+    /* border:red dashed 1px; */
+    text-align:center;
+}
+/*This is the start of the webpage*/
+h6{
+    color:darkred;
+}
+.wrapper{
+    min-height:1700px;
+    min-width:1000px;
+    background-color:silver;
+}
+    /*Define the classes below*/
+    .entry_field{
+        height:100px;
+        width:100%;
+        margin:auto;
+    }
+        .entry_field input{
+            text-align:left;
+        }
+    .login input{
+        text-align:left;
+    }
+    .login button{
+        display:block;
+        margin:auto;
+        margin-top:5px;
+    }
+    .quotebox{
+        width:300px;
+        min-height:200px;
+        background-color:white;
+        border:solid black 2px;
+        display:inline-block;
+        margin-left:20px;
+        vertical-align:top;
+    }
+    .move{
+        margin-left:1000px;
+    }
+    .allquotes{
+        display:inline-block;
+        height:500px;
+        width:300px;
+        vertical-align:top;
+    }
+        .quote{
+            min-height:150px;
+            width:250px;
+            background-color:white;
+            margin:5px;
+            padding:5px;
+            border:solid 1px black;
+            border-radius:4px;
+        }
+    .addquote{
+        display:inline-block;
+        height:300px;
+        width:200px;
+        margin-left:300px;
+    }
+        .area{
+            height:100px;
+            width:150px;
+        }
+    
+    .logout{
+        background-color:skyblue;
+        border:black solid 1px;
+        border-radius:2px;
+        padding:5px;
+    }
