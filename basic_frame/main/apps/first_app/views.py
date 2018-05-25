@@ -7,6 +7,7 @@ import bcrypt
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 from statsmodels.formula.api import ols
 
 def index(request):
@@ -199,6 +200,29 @@ def graph_interface(request,user_id):
         "user_id" : user_id
     }
     return render(request, 'django_app/create_graph.html', context)
+
+def coin(request):
+    # API endpoint
+    URL = "https://api.coinmarketcap.com/v2/ticker/1"
+    URL2 = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
+    # Create GET request to API
+    response2 = requests.get(URL2)
+    response = requests.get(URL)
+    # Translate to JSON
+    data = response.json()
+    mark = response2.json()
+    # Storing date and price into variables
+    datePrice = []
+    for i in range(0,400):
+        time = datetime.fromtimestamp(int((mark['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
+        price = mark['price_usd'][i][1]
+        datePrice.append({'time': time,'price': price})
+    context = {
+       "prices": json.dumps(datePrice[:])
+    }
+    print(context['prices'][0][0])
+    # pass data through return
+    return render(request, "django_app/coin_page.html", context)
 
 def logout(request):
     request.session.clear()
