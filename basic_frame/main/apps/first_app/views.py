@@ -4,6 +4,10 @@ from datetime import date, datetime
 from .models import users
 from django.contrib import messages
 import bcrypt
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.formula.api import ols
 
 def index(request):
     if 'initial' in request.session: #allows me to do things on initialization
@@ -87,7 +91,6 @@ def show(request, id): #success page
                     'full_name' : (this_user.fname + ' ' + this_user.lname),
                     'email' : this_user.email,
                     'created_at' : this_user.created_at,
-                    'quotes' : this_user.quotes.all() 
                    }
         request.session['first_name'] = this_user.fname
         return render(request,"django_app/user_graphs.html", context)
@@ -147,7 +150,6 @@ def dashboard(request):
         messages.add_message(request, 0, 'you must log in')
         return redirect('/users/login_page')
     context = {
-        'allquotes' : quotes.objects.all(),
         'user' : users.objects.get(id = str(user_id))
     }
     return render(request, "django_app/coin_graphs_homepage.html", context)
@@ -175,11 +177,16 @@ def addquote(request,user_id):
     else:
         return redirect('/graphs')
 
-def delquote(request,quote_id):
-    if request.method == 'POST':
-        return redirect('/graphs')
-    else:
-        return redirect('/graphs')
+def correlate(request,graph_id):
+    user_id = str(request.session['user_id'])
+    graph = int(graph_id)
+    x = np.linspace(-5,5,20)
+    np.random.seed(graph)
+    y = -5 + 3*x + 4 *np.random.normal(size=x.shape)
+    plt.figure(figsize=(5,4)) #random figure with an up correlation
+    plt.plot(x,y,'o')
+    plt.figure().savefig('exampleplot'+ str(graph_id) +'.svg') #saves the file
+    return redirect('/users/'+user_id)
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
@@ -197,23 +204,8 @@ def logout(request):
     request.session.clear()
     return redirect('/users')
 
-# def destroy(request, id):
-#     this_user = users.objects.get(id = str(id))
-#     print('DESTROY::',this_user)
-#     this_user.delete()
-#     return redirect('/users')
-
-# def update(request,id):
-#     if request.method == "POST":
-#         errors = users.objects.basic_validator(request.POST)
-#         if len(errors):
-#             for error in errors:
-#                 messages.add_message(request, messages.INFO, error)
-#         else:
-#             this_user = users.objects.get(id = str(id))
-#             this_user.fname = request.POST['first_name']
-#             this_user.lname = request.POST['last_name']
-#             this_user.email = request.POST['email']
-#         return redirect(("/users/"+id))
-#     else:
-#         return redirect(("/users/"+id))
+def correlation(request):
+    col1 = [1,2,3,4,5]
+    col2 = [1,2,3,4,5]
+    col1.corr(col2)
+    return redirect('/graph')

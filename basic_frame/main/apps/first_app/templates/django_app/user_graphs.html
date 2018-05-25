@@ -18,14 +18,14 @@
         {% if messages %} {% for message in messages %}
         <h6>{{message}}</h6>
         {% endfor %} {% endif %}
-        {% if request.session.create == True %}
-        <h3 style = "color:darkgreen">Successfully Registered</h3>
-        {% else %}
-        <h3 style = "color:darkgreen">Successfully Logged In</h3>
-        {% endif %}
+        
         <div class = 'graphbox'>
-            <p>Graph goes here</p>
+            <img src = "{% static 'django_app\img\exampleplot1.svg' %}" alt = "{% static 'django_app\img\exampleplot1.svg' %}">
         </div>
+        <form action = '/graphs/analyze/1'>
+            <button>Add Graph</button>
+        </form>
+        
         <form action='/graphs'>
             <button class='logout' type='submit'>Homepage</button>
         </form>

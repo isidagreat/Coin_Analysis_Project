@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^users/add$', views.create), #post create user
     url(r'^users/edit$', views.edit_user), #edit user and validate the post data
     url(r'^graphs/add/(?P<user_id>\d+)$', views.addquote), #posts a quote from dashboard
-    url(r'^graphs/delete/(?P<quote_id>\d+)$', views.delquote), #posts a quote from dashboard
+    url(r'^graphs/analyze/(?P<graph_id>\d+)$', views.correlate), #posts a graph to user's page
     url(r'^graphs/like/(?P<user_id>\d+)/(?P<quote_id>\d+)$', views.like), #posts a quote from dashboard
     #-------VALIDATIONS------
     url(r'^users/login$', views.login) #login validation
