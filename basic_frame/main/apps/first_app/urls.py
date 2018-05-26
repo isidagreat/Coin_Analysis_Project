@@ -8,12 +8,12 @@ urlpatterns = [
     url(r'^users/(?P<id>\d+)/edit$', views.edit_page),#edit user template
     url(r'^graphs$', views.dashboard), #graph homepage
     url(r'^graphs/dashboard/(?P<user_id>\d+)$', views.graph_interface), #the page that shows the making a graph interface
-    url(r'^coin$', views.coin), #template for coin page
+    url(r'^coin$', views.coin_page), #template for coin page
     #------POSTS------------
     url(r'^users/logout$', views.logout), #clears session
     url(r'^users/add$', views.create), #post create user
     url(r'^users/edit$', views.edit_user), #edit user and validate the post data
-    url(r'^graphs/add/(?P<user_id>\d+)$', views.addquote), #posts a quote from dashboard
+    url(r'^graphs/add/(?P<user_id>\d+)$', views.del_graph), #posts a quote from dashboard
     url(r'^graphs/analyze/(?P<graph_id>\d+)$', views.correlate), #posts a graph to user's page
     url(r'^graphs/like/(?P<user_id>\d+)/(?P<quote_id>\d+)$', views.like), #posts a quote from dashboard
     #-------VALIDATIONS------

@@ -1,13 +1,14 @@
 from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
 from datetime import date, datetime
-from .models import users
+from .models import users, coin
 from django.contrib import messages
-import bcrypt
+import bcrypt, matplotlib, requests, pyscopg2
 import pandas as pd
 import numpy as np
+matplotlib.use('SVG')
 import matplotlib.pyplot as plt
-import json
+import simplejson as json
 from statsmodels.formula.api import ols
 
 def index(request):
@@ -46,10 +47,10 @@ def login(request):
                 if key_prev != key: #allows for multiple errors to display over one box
                     key_prev = key
                     category += 1               
-                print(key,value,category)
+                #print(key,value,category)
                 messages.set_level(request,category) #otherwise will ignore add message
                 messages.add_message(request, category, value)    
-            print('ERROR::',errors)
+            #print('ERROR::',errors)
             return redirect('/users/login_page')
         else: #no errors passed credentials true
             userID = users.objects.get(email = request.POST['email']).id
@@ -69,9 +70,9 @@ def create(request): #user registration
                 if key_prev != key: #allows for multiple errors to display over one box
                     key_prev = key
                     category += 1
-                print(key,value,category)
+                #print(key,value,category)
                 messages.add_message(request, category, value)    
-            print('ERROR::',errors)
+            #print('ERROR::',errors)
             return redirect('/')
         else: #create user
             hash_pw = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
@@ -79,7 +80,7 @@ def create(request): #user registration
             user_id = user.id
             request.session['create'] = True
             request.session['user_id'] = user_id
-            print('CREATED::', user)
+            #print('CREATED::', user)
             return redirect("/graphs")
     else:
         return redirect('/')
@@ -87,11 +88,12 @@ def create(request): #user registration
 def show(request, id): #success page
     if request.session['user_id'] != -1: #user is here
         this_user = users.objects.get(id = str(id))
-        print('SHOW::',this_user)
+        #print('SHOW::',this_user)
         context = {'ID' : this_user.id,
                     'full_name' : (this_user.fname + ' ' + this_user.lname),
                     'email' : this_user.email,
                     'created_at' : this_user.created_at,
+                    'iterator' : [1,2,3,4]
                    }
         request.session['first_name'] = this_user.fname
         return render(request,"django_app/user_graphs.html", context)
@@ -102,7 +104,7 @@ def show(request, id): #success page
 def edit_page(request, id): #edit page
     if request.session['user_id'] != -1: #user is here
         this_user = users.objects.get(id = str(id))
-        print('SHOW::',this_user)
+        #print('SHOW::',this_user)
         context = {'ID' : this_user.id,
                     'first_name' : this_user.fname,
                     'last_name' : this_user.lname,
@@ -132,7 +134,7 @@ def edit_user(request):
                     category += 1
                 print(key,value,category)
                 messages.add_message(request, category, value)    
-            print('ERROR::',errors)
+            #print('ERROR::',errors)
             return redirect("/users/"+str(user_id)+'/edit')
         else: #update user
             this_user = users.objects.get(id = str(user_id))
@@ -155,38 +157,28 @@ def dashboard(request):
     }
     return render(request, "django_app/coin_graphs_homepage.html", context)
 
-def addquote(request,user_id):
+def del_graph(request,user_id):
     if request.method == "POST":
-        # errors = quotes.objects.quote_validator(request.POST)
-        # category=0
-        # key_prev = 'j'
-        # if len(errors):
-        #     for key,value in errors.items():
-        #         messages.set_level(request,category) #otherwise will ignore add message
-        #         if key_prev != key: #allows for multiple errors to display over one box
-        #             key_prev = key
-        #             category += 1
-        #         print(key,value,category)
-        #         messages.add_message(request, category, value)
-        #     print('ERROR::',errors)
+        #os.remove()
         return redirect('/graphs')
-        # else: #create quote
-        #     # poster = users.objects.get(id = user_id)
-        #     # print(poster)
-        #     # this_quote = quotes.objects.create(quotee = request.POST['quotee'], quote = request.POST['quote'], poster = poster) #poster likes his own posts automatically
-        #     return redirect('/graphs')
+       
     else:
         return redirect('/graphs')
 
-def correlate(request,graph_id):
+def correlate(request,graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmodels = ols
     user_id = str(request.session['user_id'])
     graph = int(graph_id)
+    bc_array = get_coin_data(1)
     x = np.linspace(-5,5,20)
-    np.random.seed(graph)
-    y = -5 + 3*x + 4 *np.random.normal(size=x.shape)
-    plt.figure(figsize=(5,4)) #random figure with an up correlation
+    print(x)
+    seed = np.random.seed(graph) #seed is nonetype, but seeds the random generator
+    y = -5 + 3*x + 4 * np.random.normal(size=x.shape) 
+    print(y)
+    fig = plt.figure(figsize=(3,2))
     plt.plot(x,y,'o')
-    plt.figure().savefig('exampleplot'+ str(graph_id) +'.svg') #saves the file
+    print(fig)
+    fig.savefig('./apps/first_app/static/django_app/img/exampleplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
+    plt.close(fig)
     return redirect('/users/'+user_id)
 
 def like(request,user_id,quote_id):
@@ -201,24 +193,10 @@ def graph_interface(request,user_id):
     }
     return render(request, 'django_app/create_graph.html', context)
 
-def coin(request):
-    # API endpoint
-    URL = "https://api.coinmarketcap.com/v2/ticker/1"
-    URL2 = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
-    # Create GET request to API
-    response2 = requests.get(URL2)
-    response = requests.get(URL)
-    # Translate to JSON
-    data = response.json()
-    mark = response2.json()
-    # Storing date and price into variables
-    datePrice = []
-    for i in range(0,400):
-        time = datetime.fromtimestamp(int((mark['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
-        price = mark['price_usd'][i][1]
-        datePrice.append({'time': time,'price': price})
+def coin_page(request): 
+    bitcoin = get_coin_data(1) #or 1
     context = {
-       "prices": json.dumps(datePrice[:])
+       "prices": json.dumps(bitcoin[:])
     }
     print(context['prices'][0][0])
     # pass data through return
@@ -233,3 +211,37 @@ def correlation(request):
     col2 = [1,2,3,4,5]
     col1.corr(col2)
     return redirect('/graph')
+
+def get_coin_data(coin_id): #this function pulls the api data and returns it in an array 
+    #later on we will abstract the time range that we want as well
+    #1 for bitcoin, 2 for tether
+    # API endpoint
+    #coin_id = int(coin_id)
+    if coin_id == 2: #its tether
+        coin_name = 'tether'
+        URL = "https://api.coinmarketcap.com/v2/ticker/825"
+        URL2 = 'https://graphs2.coinmarketcap.com/currencies/tether/'
+    else: #its bitcoin
+        coin_name = 'bitcoin'
+        URL = "https://api.coinmarketcap.com/v2/ticker/1"
+        URL2 = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
+    # Create GET request to API
+    response2 = requests.get(URL2)
+    response = requests.get(URL)
+    # Translate to JSON
+    data = response.json()
+    mark = response2.json()
+    # Storing date and price into variables
+    datePrice = []
+    for i in range(0,400):
+        time = datetime.fromtimestamp(int((mark['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
+        price = mark['price_usd'][i][1]
+        datePrice.append({'time': time,'price': price})
+    print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
+    #call each element with datePrice[i].time or datePrice[i].price
+    return datePrice
+
+def new_database(filename):
+    createdb coin_analysis
+    
+
