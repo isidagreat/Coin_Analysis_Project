@@ -31,39 +31,14 @@ h6{
         margin:auto;
         margin-top:5px;
     }
-    .quotebox{
-        width:300px;
-        min-height:200px;
-        background-color:white;
-        border:solid black 2px;
+    .graphbox{
         display:inline-block;
-        margin-left:20px;
-        vertical-align:top;
+        width:35%;
     }
     .move{
         margin-left:1000px;
     }
-    .allquotes{
-        display:inline-block;
-        height:500px;
-        width:300px;
-        vertical-align:top;
-    }
-        .quote{
-            min-height:150px;
-            width:250px;
-            background-color:white;
-            margin:5px;
-            padding:5px;
-            border:solid 1px black;
-            border-radius:4px;
-        }
-    .addquote{
-        display:inline-block;
-        height:300px;
-        width:200px;
-        margin-left:300px;
-    }
+    
         .area{
             height:100px;
             width:150px;

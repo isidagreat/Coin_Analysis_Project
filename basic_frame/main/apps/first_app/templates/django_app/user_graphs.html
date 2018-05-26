@@ -18,14 +18,14 @@
         {% if messages %} {% for message in messages %}
         <h6>{{message}}</h6>
         {% endfor %} {% endif %}
-        
+        {% for i in iterator %}
         <div class = 'graphbox'>
-            <img src = "{% static 'django_app\img\exampleplot1.svg' %}" alt = "{% static 'django_app\img\exampleplot1.svg' %}">
+            <img src = "{% static 'django_app\img' %}\exampleplot{{i}}.svg"  alt = "{% static 'django_app\img' %}/whitesquare.png">
+            <form action = '/graphs/analyze/{{i}}'>
+                <button>Add Graph</button>
+            </form>
         </div>
-        <form action = '/graphs/analyze/1'>
-            <button>Add Graph</button>
-        </form>
-        
+        {% endfor %}
         <form action='/graphs'>
             <button class='logout' type='submit'>Homepage</button>
         </form>
