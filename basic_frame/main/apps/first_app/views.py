@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
-from datetime import date, datetime
+from datetime import date, datetime, time
+from time import mktime
 from .models import users, coin
 from django.contrib import messages
 import bcrypt, matplotlib, requests, pyscopg2
@@ -8,8 +9,12 @@ import pandas as pd
 import numpy as np
 matplotlib.use('SVG')
 import matplotlib.pyplot as plt
+import json
+import requests
 import simplejson as json
 from statsmodels.formula.api import ols
+from .write_json import *
+from .datetimecalculation import *
 
 def index(request):
     if 'initial' in request.session: #allows me to do things on initialization
@@ -192,16 +197,63 @@ def graph_interface(request,user_id):
         "user_id" : user_id
     }
     return render(request, 'django_app/create_graph.html', context)
-
-def coin_page(request): 
-    bitcoin = get_coin_data(1) #or 1
+  
+def coin(request, id,time):
+    # call coinHist function
+    data = coinHist(id, time)
+    if data == False:
+        return redirect("/")
+    info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
+    coin= info.json()
     context = {
-       "prices": json.dumps(bitcoin[:])
+        "coins": coin,
+        "prices": json.dumps(data[:])
     }
-    print(context['prices'][0][0])
-    # pass data through return
     return render(request, "django_app/coin_page.html", context)
 
+def dateRange(request,id):
+    start = request.POST['start']
+    print (start)
+    timestamp1= mktime(datetime.strptime(start, "%Y-%m-%d").timetuple())
+    print (int(timestamp1))
+    end =request.POST['end']
+    print (end)
+    timestamp2= mktime(datetime.strptime(end, "%Y-%m-%d").timetuple())
+    print (int(timestamp2))
+
+    if id == '825':
+        URL = "https://graphs2.coinmarketcap.com/currencies/tether/"
+    elif id == '1':
+        URL = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
+    else:
+        return redirect("/")
+    # Create GET request to API
+    response = requests.get(URL)
+    # Translate to JSON
+    data = response.json()
+    # Storing date and price into Object List
+    totals = len(data['price_usd'])
+    datePrice =[]
+    for i in range(0,len(data['price_usd'])):
+        if datetime.fromtimestamp(int(timestamp1)).strftime('%Y-%m-%d') == datetime.fromtimestamp(int((data['price_usd'][i][0])/1000)).strftime('%Y-%m-%d'):
+            count = i
+            while datetime.fromtimestamp(int(timestamp2)).strftime('%Y-%m-%d') != datetime.fromtimestamp(int((data['price_usd'][count][0]))/1000).strftime('%Y-%m-%d'):
+                times = datetime.fromtimestamp(int((data['price_usd'][count][0])/1000)).strftime('%Y-%m-%d')
+                price = data['price_usd'][count][1]
+                datePrice.append({'time': times,'price': price})
+                count += 1
+        else:
+            pass
+    if data == False:
+        return redirect("/")
+    info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
+    coin= info.json()
+    context = {
+        "coins": coin,
+        "prices": json.dumps(datePrice[:])
+    }
+
+    return render(request,"django_app/coin_page.html", context )
 def logout(request):
     request.session.clear()
     return redirect('/users')

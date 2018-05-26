@@ -1,8 +1,6 @@
-.chart div{
-	font: 10px sans serif;
-	background-color: steelblue;
-	text-align: right;
-	padding: 3px;
-	margin: 1px;
-	color: white;
+.bar-chart div{
+background-color: #C7D9D9;
+}
+.bar-chart2 div{
+background-color: #C7D9D9;
 }
