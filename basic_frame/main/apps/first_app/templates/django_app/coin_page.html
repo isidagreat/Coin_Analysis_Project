@@ -9,7 +9,7 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!-- <script type="text/javascript" src="{% static 'django_app/javascript/coin_page.js' %}"></script> -->
+    <script src="{% static 'django_app/javascript/coin_page.js' %}"></script>
 </head>
 
 <body>
@@ -17,41 +17,57 @@
         <div class="hero-body">
             <div class="container">
                 <h1 class="title">
-                    {{data.name}}
+                    {{coins.data.name}}
                 </h1>
-                <h2>
-                    Price: ${{data.quotes.USD.price}}
+                <h2 class="subtitle">
+                    Price: ${{coins.data.quotes.USD.price}}
                 </h2>
             </div>
         </div>  
     </section>
     <div class="columns">
         <div class="column">
-            <p> This page will  display the historical graph of one coin that is clicked on from the homepage. Data includes historical data of whichever coin is clicked, with the date-range and perhaps significant statistical changes</p>
+            <p>{{coins.data.name}} has a suppy of {{coins.data.total_supply}} and a total 
+                market cap of {{coins.data.quotes.USD.market_cap}}
+            </p>
         </div>
     </div>
-    <div class="chart column">
-        {%if prices%}
-        {% for i in prices%}
-        <p>Bitcoin price: {{i.time}} {{i.price}}</p>
-        {% endfor %}
-        {% endif %}
-        <script>
-            function importData(){
-                d3.json("static/django_app/data/histData.json' ", function(data){
-                    console.log(data);
-                })
-            }
-            var data = [30, 86, 168, 281, 303, 365];
+    <div class="bar-chart column">
+        <svg class="line-chart">
+            <script>
+                var data_from_django = {{prices |safe}};
+                var data = [];
+                for (i = 0; i < data_from_django.length; i++ )
+                {
+                    data.push(
+                    {
+                    date: new Date(data_from_django[i]['time']),
+                    value: +data_from_django[i]['price']
+                    });
+                } 
+                drawChart(data);   
+            </script>
+        </svg>
+        <div class="hero-foot">
+            <nav class="tabs is-boxed is-fullwidth">
+                <div class="container">
+                    <ul>
+                        
+                        <li><a href="/coin/{{coins.data.id}}/7">1 Week</a></li>
+                        <li><a href="/coin/{{coins.data.id}}/30">30 day</a></li>
+                        <li><a href="/coin/{{coins.data.id}}/365">1year</a></li>
+                        <li><a>custom range:</a></li>
+                        <form action="/coin/{{coins.data.id}}/custom" method="post">
+                            {%csrf_token%}
+                         <li><input class="input" type="date" name="start"></li>
+                         <li><input class="input" type="date" name="end"></li>
+                         <input class="button" type="submit" name="btn">
+                        </form>
+                    </ul>
 
-            d3.select(".chart")
-            .selectAll("div")
-            .data(data)
-            .enter()
-            .append("div")
-            .style("width", function(d) { return d * 2 + "px"; })
-            .text(function(d) { return '$ ' + d; });    
-        </script>
+                </div>
+            </nav>
+        </div>
     </div>
 </body>
 </html>

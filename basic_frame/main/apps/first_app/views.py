@@ -8,7 +8,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+import requests
 from statsmodels.formula.api import ols
+from .write_json import *
+from .datetimecalculation import *
 
 def index(request):
     if 'initial' in request.session: #allows me to do things on initialization
@@ -201,28 +204,44 @@ def graph_interface(request,user_id):
     }
     return render(request, 'django_app/create_graph.html', context)
 
-def coin(request):
-    # API endpoint
-    URL = "https://api.coinmarketcap.com/v2/ticker/1"
-    URL2 = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
+def coin(request, id,time):
+    # call coinHist function
+    data = coinHist(id, time)
+    if data == False:
+        return redirect("/")
+    info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
+    coin= info.json()
+    context = {
+        "coins": coin,
+        "prices": json.dumps(data[:])
+    }
+    return render(request, "django_app/coin_page.html", context)
+
+def dateRange(request,id):
+    start = request.POST['start']
+    print (start)
+    timestamp1= time.mktime(datetime.strptime(start, "%Y/%m/%d").timetuple())
+    print (timestamp1)
+    request.POST['end']
+
+    if id == '825':
+        URL = "https://graphs2.coinmarketcap.com/currencies/tether/"
+    elif id == '1':
+        URL = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
+    else:
+        return redirect("/")
     # Create GET request to API
-    response2 = requests.get(URL2)
     response = requests.get(URL)
     # Translate to JSON
     data = response.json()
-    mark = response2.json()
-    # Storing date and price into variables
-    datePrice = []
-    for i in range(0,400):
-        time = datetime.fromtimestamp(int((mark['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
-        price = mark['price_usd'][i][1]
-        datePrice.append({'time': time,'price': price})
-    context = {
-       "prices": json.dumps(datePrice[:])
-    }
-    print(context['prices'][0][0])
-    # pass data through return
-    return render(request, "django_app/coin_page.html", context)
+    # Storing date and price into Object List
+    totals = len(data['price_usd'])
+    
+    for i in range(span,len(data['price_usd'])):
+        times = datetime.fromtimestamp(int((data['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
+        price = data['price_usd'][i][1]
+        datePrice.append({'time': times,'price': price})
+    return redirect("/coin/"+id+"/"+365)
 
 def logout(request):
     request.session.clear()

@@ -8,7 +8,8 @@ urlpatterns = [
     url(r'^users/(?P<id>\d+)/edit$', views.edit_page),#edit user template
     url(r'^graphs$', views.dashboard), #graph homepage
     url(r'^graphs/dashboard/(?P<user_id>\d+)$', views.graph_interface), #the page that shows the making a graph interface
-    url(r'^coin$', views.coin), #template for coin page
+    url(r'^coin/(?P<id>\d+)/(?P<time>\d+)$', views.coin),
+    url(r'^coin/(?P<id>\d+)/custom$', views.dateRange), #template for coin page
     #------POSTS------------
     url(r'^users/logout$', views.logout), #clears session
     url(r'^users/add$', views.create), #post create user
