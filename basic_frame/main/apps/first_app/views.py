@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
-from datetime import date, datetime
+from datetime import date, datetime, time
+from time import mktime
 from .models import users
 from django.contrib import messages
 import bcrypt
@@ -220,9 +221,12 @@ def coin(request, id,time):
 def dateRange(request,id):
     start = request.POST['start']
     print (start)
-    timestamp1= time.mktime(datetime.strptime(start, "%Y/%m/%d").timetuple())
-    print (timestamp1)
-    request.POST['end']
+    timestamp1= mktime(datetime.strptime(start, "%Y-%m-%d").timetuple())
+    print (int(timestamp1))
+    end =request.POST['end']
+    print (end)
+    timestamp2= mktime(datetime.strptime(end, "%Y-%m-%d").timetuple())
+    print (int(timestamp2))
 
     if id == '825':
         URL = "https://graphs2.coinmarketcap.com/currencies/tether/"
@@ -236,13 +240,27 @@ def dateRange(request,id):
     data = response.json()
     # Storing date and price into Object List
     totals = len(data['price_usd'])
-    
-    for i in range(span,len(data['price_usd'])):
-        times = datetime.fromtimestamp(int((data['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
-        price = data['price_usd'][i][1]
-        datePrice.append({'time': times,'price': price})
-    return redirect("/coin/"+id+"/"+365)
+    datePrice =[]
+    for i in range(0,len(data['price_usd'])):
+        if datetime.fromtimestamp(int(timestamp1)).strftime('%Y-%m-%d') == datetime.fromtimestamp(int((data['price_usd'][i][0])/1000)).strftime('%Y-%m-%d'):
+            count = i
+            while datetime.fromtimestamp(int(timestamp2)).strftime('%Y-%m-%d') != datetime.fromtimestamp(int((data['price_usd'][count][0]))/1000).strftime('%Y-%m-%d'):
+                times = datetime.fromtimestamp(int((data['price_usd'][count][0])/1000)).strftime('%Y-%m-%d')
+                price = data['price_usd'][count][1]
+                datePrice.append({'time': times,'price': price})
+                count += 1
+        else:
+            pass
+    if data == False:
+        return redirect("/")
+    info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
+    coin= info.json()
+    context = {
+        "coins": coin,
+        "prices": json.dumps(datePrice[:])
+    }
 
+    return render(request,"django_app/coin_page.html", context )
 def logout(request):
     request.session.clear()
     return redirect('/users')
