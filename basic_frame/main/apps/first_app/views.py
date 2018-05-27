@@ -4,7 +4,7 @@ from datetime import date, datetime, time
 from time import mktime
 from .models import users, coin
 from django.contrib import messages
-import bcrypt, matplotlib, requests, pyscopg2
+import bcrypt, matplotlib, requests
 import pandas as pd
 import numpy as np
 matplotlib.use('SVG')
@@ -202,7 +202,7 @@ def coin(request, id,time):
     # call coinHist function
     data = coinHist(id, time)
     if data == False:
-        return redirect("/")
+        return redirect("/graphs")
     info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
     coin= info.json()
     context = {
@@ -292,8 +292,4 @@ def get_coin_data(coin_id): #this function pulls the api data and returns it in 
     print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
     #call each element with datePrice[i].time or datePrice[i].price
     return datePrice
-
-def new_database(filename):
-    createdb coin_analysis
-    
 
