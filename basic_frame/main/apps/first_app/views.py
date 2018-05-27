@@ -293,7 +293,6 @@ def get_coin_data(coin_id): #this function pulls the api data and returns it in 
     #call each element with datePrice[i].time or datePrice[i].price
     return datePrice
 
-def new_database(filename):
-    createdb coin_analysis
+
     
 
