@@ -4,17 +4,18 @@ from datetime import date, datetime, time
 from time import mktime
 from .models import users, coin
 from django.contrib import messages
-import bcrypt, matplotlib, requests, pyscopg2
+import bcrypt, matplotlib, requests
 import pandas as pd
 import numpy as np
 matplotlib.use('SVG')
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt, mpld3
 import json
 import requests
 import simplejson as json
 from statsmodels.formula.api import ols
 from .write_json import *
-from .datetimecalculation import *
+from .datetimecalculation import * #sids custom function
+from .erikdatetimecalc import * #erik's custom function built on sids
 
 def index(request):
     if 'initial' in request.session: #allows me to do things on initialization
@@ -164,7 +165,8 @@ def dashboard(request):
 
 def del_graph(request,user_id):
     if request.method == "POST":
-        #os.remove()
+        #os.remove() #removing a file in use in windows causes an exception to be raised
+        #this means that we cannot dynamically use files to render graphs
         return redirect('/graphs')
        
     else:
@@ -173,16 +175,20 @@ def del_graph(request,user_id):
 def correlate(request,graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmodels = ols
     user_id = str(request.session['user_id'])
     graph = int(graph_id)
-    bc_array = get_coin_data(1)
-    x = np.linspace(-5,5,20)
-    print(x)
-    seed = np.random.seed(graph) #seed is nonetype, but seeds the random generator
-    y = -5 + 3*x + 4 * np.random.normal(size=x.shape) 
-    print(y)
+    bc_array = coinHist('1',7)
+    x=[]
+    y=[]
+    for obj in bc_array:
+        x.append(obj['time'])
+        y.append(obj['price'])
+        print(obj['time'], obj['price'])
+    print('X::',x[0])
+    print('Y::',y[0])
+    a = [x,y] #2d column
+    print('A::',a[0][0],a[1][0])
     fig = plt.figure(figsize=(3,2))
-    plt.plot(x,y,'o')
-    print(fig)
-    fig.savefig('./apps/first_app/static/django_app/img/exampleplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
+    plt.plot(a[0],a[1])
+    fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
     plt.close(fig)
     return redirect('/users/'+user_id)
 
@@ -198,11 +204,12 @@ def graph_interface(request,user_id):
     }
     return render(request, 'django_app/create_graph.html', context)
   
-def coin(request, id,time):
+def coin(request, id,begin,end):
     # call coinHist function
-    data = coinHist(id, time)
+    #data = coinHist(id, time)
+    data = coinHist(id,begin, end)
     if data == False:
-        return redirect("/")
+        return redirect("/graphs")
     info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
     coin= info.json()
     context = {
@@ -292,8 +299,4 @@ def get_coin_data(coin_id): #this function pulls the api data and returns it in 
     print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
     #call each element with datePrice[i].time or datePrice[i].price
     return datePrice
-
-def new_database(filename):
-    createdb coin_analysis
-    
 
