@@ -12,7 +12,7 @@ def coinHistory(id,begin_time, end_time):
     response = requests.get(URL)
     # Translate to JSON
     data = response.json()
-    if data.status_code != requests.code.ok: #checks if get/json was successful
+    if response.status_code != requests.code.ok: #checks if get/json was successful
         return False
     # Storing date and price into Object List
     max_len = int(len(data['price_usd']))
@@ -30,7 +30,7 @@ def coinHistory(id,begin_time, end_time):
     #end_time validation
     if type(end_time) != type(1):
         end_time = max_len
-    elif end_time > max_len): #when placing the second boundary, it needs to be after begin_time and before max length
+    elif end_time > max_len: #when placing the second boundary, it needs to be after begin_time and before max length
         end_time = max_len #max range
     elif end_time < begin_time:
         end_time = begin_time + 1 #min range

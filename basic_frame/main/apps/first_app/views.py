@@ -172,25 +172,44 @@ def del_graph(request,user_id):
     else:
         return redirect('/graphs')
 
-def correlate(request,graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmodels = ols
-    user_id = str(request.session['user_id'])
-    graph = int(graph_id)
-    bc_array = coinHist('1',7)
-    x=[]
-    y=[]
-    for obj in bc_array:
-        x.append(obj['time'])
-        y.append(obj['price'])
-        print(obj['time'], obj['price'])
-    print('X::',x[0])
-    print('Y::',y[0])
-    a = [x,y] #2d column
-    print('A::',a[0][0],a[1][0])
-    fig = plt.figure(figsize=(3,2))
-    plt.plot(a[0],a[1])
-    fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
-    plt.close(fig)
+def plot(request, graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmodels = ols
+    if request.method == 'POST':
+        user_id = str(request.session['user_id'])
+        graph = int(graph_id)
+
+        start = request.POST['start']
+        print('FORM::',start)
+        timestamp1 = datetime.strptime(start, "%Y-%m-%d")
+        print('STAMP1::',timestamp1)
+        end = request.POST['end']
+        timestamp2 = datetime.strptime(end, "%Y-%m-%d")
+        #print('STAMP2::',timestamp2)
+        diff = (timestamp1 - timestamp2)
+        numDays = diff.days
+
+        coin1_array = coinHistory(int(request.POST['x_coin']),50,1000)
+        coin2_array = coinHistory(int(request.POST['y_coin']),50,1000)
+        if coin1_array != False and coin2_array != False: 
+            # x= axis(coin1_array, 'price')
+            # y= axis(coin2_array, 'price')
+            # plotarr = [x,y] #2d array for plotting
+            # fig = plt.figure(figsize=(3,2))
+            # plt.plot(plotarr[0],plotarr[1])
+            return redirect('/graphs/dashboard/'+user_id)
+        else:
+            return redirect('/users/'+user_id)
+    else:
+        return redirect('/users/'+user_id)
+    #fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
+    # fig.fig_to_html()
+    # plt.close(fig)
     return redirect('/users/'+user_id)
+
+def axis(array,key_str): #this function searches a passed in array for the key_str and returns the array of only those values
+    axis_var = [] #can be x or y usually
+    for obj in array:
+        axis_var.append(obj[key_str])
+    return axis_var
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
@@ -207,7 +226,7 @@ def graph_interface(request,user_id):
 def coin(request, id,begin,end):
     # call coinHist function
     #data = coinHist(id, time)
-    data = coinHist(id,begin, end)
+    data = coinHistory(id,begin, end)
     if data == False:
         return redirect("/graphs")
     info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
@@ -270,33 +289,4 @@ def correlation(request):
     col2 = [1,2,3,4,5]
     col1.corr(col2)
     return redirect('/graph')
-
-def get_coin_data(coin_id): #this function pulls the api data and returns it in an array 
-    #later on we will abstract the time range that we want as well
-    #1 for bitcoin, 2 for tether
-    # API endpoint
-    #coin_id = int(coin_id)
-    if coin_id == 2: #its tether
-        coin_name = 'tether'
-        URL = "https://api.coinmarketcap.com/v2/ticker/825"
-        URL2 = 'https://graphs2.coinmarketcap.com/currencies/tether/'
-    else: #its bitcoin
-        coin_name = 'bitcoin'
-        URL = "https://api.coinmarketcap.com/v2/ticker/1"
-        URL2 = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
-    # Create GET request to API
-    response2 = requests.get(URL2)
-    response = requests.get(URL)
-    # Translate to JSON
-    data = response.json()
-    mark = response2.json()
-    # Storing date and price into variables
-    datePrice = []
-    for i in range(0,400):
-        time = datetime.fromtimestamp(int((mark['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
-        price = mark['price_usd'][i][1]
-        datePrice.append({'time': time,'price': price})
-    print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
-    #call each element with datePrice[i].time or datePrice[i].price
-    return datePrice
 
