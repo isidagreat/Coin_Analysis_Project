@@ -1,6 +1,6 @@
 import requests
 from datetime import date, datetime
-def coinHistory(id,begin_time, end_time):
+def coinHistory(id,begin_time, end_time): #begin and end time should be unix timestamps
   # Find specific coin wanted through id
     if id == '825':
         URL = "https://graphs2.coinmarketcap.com/currencies/tether/"

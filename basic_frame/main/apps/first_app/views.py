@@ -13,7 +13,7 @@ import json
 import requests
 import simplejson as json
 from statsmodels.formula.api import ols
-from .write_json import *
+from .write_json import * #dont need anymore
 from .datetimecalculation import * #sids custom function
 from .erikdatetimecalc import * #erik's custom function built on sids
 
@@ -237,7 +237,7 @@ def coin(request, id,begin,end):
     }
     return render(request, "django_app/coin_page.html", context)
 
-def dateRange(request,id):
+def dateRange(request,id): #dont need anymore
     start = request.POST['start']
     print (start)
     timestamp1= mktime(datetime.strptime(start, "%Y-%m-%d").timetuple())
