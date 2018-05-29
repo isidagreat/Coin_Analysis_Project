@@ -8,13 +8,14 @@ import bcrypt, matplotlib, requests
 import pandas as pd
 import numpy as np
 matplotlib.use('SVG')
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt, mpld3
 import json
 import requests
 import simplejson as json
 from statsmodels.formula.api import ols
 from .write_json import *
-from .datetimecalculation import *
+from .datetimecalculation import * #sids custom function
+from .erikdatetimecalc import * #erik's custom function built on sids
 
 def index(request):
     if 'initial' in request.session: #allows me to do things on initialization
@@ -170,27 +171,51 @@ def dashboard(request):
 
 def del_graph(request,user_id):
     if request.method == "POST":
-        #os.remove()
+        #os.remove() #removing a file in use in windows causes an exception to be raised
+        #this means that we cannot dynamically use files to render graphs
         return redirect('/graphs')
        
     else:
         return redirect('/graphs')
 
-def correlate(request,graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmodels = ols
-    user_id = str(request.session['user_id'])
-    graph = int(graph_id)
-    bc_array = get_coin_data(1)
-    x = np.linspace(-5,5,20)
-    print(x)
-    seed = np.random.seed(graph) #seed is nonetype, but seeds the random generator
-    y = -5 + 3*x + 4 * np.random.normal(size=x.shape) 
-    print(y)
-    fig = plt.figure(figsize=(3,2))
-    plt.plot(x,y,'o')
-    print(fig)
-    fig.savefig('./apps/first_app/static/django_app/img/exampleplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
-    plt.close(fig)
+def plot(request, graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmodels = ols
+    if request.method == 'POST':
+        user_id = str(request.session['user_id'])
+        graph = int(graph_id)
+
+        start = request.POST['start']
+        print('FORM::',start)
+        timestamp1 = datetime.strptime(start, "%Y-%m-%d")
+        print('STAMP1::',timestamp1)
+        end = request.POST['end']
+        timestamp2 = datetime.strptime(end, "%Y-%m-%d")
+        #print('STAMP2::',timestamp2)
+        diff = (timestamp1 - timestamp2)
+        numDays = diff.days
+
+        coin1_array = coinHistory(int(request.POST['x_coin']),50,1000)
+        coin2_array = coinHistory(int(request.POST['y_coin']),50,1000)
+        if coin1_array != False and coin2_array != False: 
+            # x= axis(coin1_array, 'price')
+            # y= axis(coin2_array, 'price')
+            # plotarr = [x,y] #2d array for plotting
+            # fig = plt.figure(figsize=(3,2))
+            # plt.plot(plotarr[0],plotarr[1])
+            return redirect('/graphs/dashboard/'+user_id)
+        else:
+            return redirect('/users/'+user_id)
+    else:
+        return redirect('/users/'+user_id)
+    #fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
+    # fig.fig_to_html()
+    # plt.close(fig)
     return redirect('/users/'+user_id)
+
+def axis(array,key_str): #this function searches a passed in array for the key_str and returns the array of only those values
+    axis_var = [] #can be x or y usually
+    for obj in array:
+        axis_var.append(obj[key_str])
+    return axis_var
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
@@ -204,11 +229,12 @@ def graph_interface(request,user_id):
     }
     return render(request, 'django_app/create_graph.html', context)
   
-def coin(request, id,time):
+def coin(request, id,begin,end):
     # call coinHist function
-    data = coinHist(id, time)
+    #data = coinHist(id, time)
+    data = coinHistory(id,begin, end)
     if data == False:
-        return redirect("/")
+        return redirect("/graphs")
     info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
     coin= info.json()
     context = {
@@ -269,6 +295,7 @@ def correlation(request):
     col2 = [1,2,3,4,5]
     col1.corr(col2)
     return redirect('/graph')
+
 
 def get_coin_data(coin_id): #this function pulls the api data and returns it in an array 
     #later on we will abstract the time range that we want as well

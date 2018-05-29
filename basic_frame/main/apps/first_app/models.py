@@ -96,4 +96,4 @@ class coin(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = quoteManager()
     def __repr__(self):
-        return "<quote object: quotee: {} quote: {}".format(self.quotee, self.quote)
+        return "<coin object: name: {} price: {} date: {}".format(self.symbol, self.price, self.timestamp)
