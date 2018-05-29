@@ -4,7 +4,7 @@ from datetime import date, datetime, time
 from time import mktime
 from .models import users, coin
 from django.contrib import messages
-import bcrypt, matplotlib, requests, pyscopg2
+import bcrypt, matplotlib, requests
 import pandas as pd
 import numpy as np
 matplotlib.use('SVG')
@@ -154,12 +154,18 @@ def edit_user(request):
 def dashboard(request):
     if request.session['user_id'] != -1:
         user_id = request.session['user_id']
+        # Returns coin historical data for last 30 days
+        data = coinHist('1', 30)
+        data2 = coinHist('825', 30)
     else:
         messages.add_message(request, 0, 'you must log in')
         return redirect('/users/login_page')
     context = {
-        'user' : users.objects.get(id = str(user_id))
+        'user' : users.objects.get(id = str(user_id)),
+        'coin1': json.dumps(data[:]),
+        'coin2': json.dumps(data2[:]),
     }
+    print (context)
     return render(request, "django_app/coin_graphs_homepage.html", context)
 
 def del_graph(request,user_id):
@@ -292,8 +298,3 @@ def get_coin_data(coin_id): #this function pulls the api data and returns it in 
     print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
     #call each element with datePrice[i].time or datePrice[i].price
     return datePrice
-
-def new_database(filename):
-    createdb coin_analysis
-    
-
