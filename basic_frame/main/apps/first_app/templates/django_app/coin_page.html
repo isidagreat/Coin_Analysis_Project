@@ -35,17 +35,8 @@
     <div class="bar-chart column">
         <svg class="line-chart">
             <script>
-                var data_from_django = {{prices |safe}};
-                var data = [];
-                for (i = 0; i < data_from_django.length; i++ )
-                {
-                    data.push(
-                    {
-                    date: new Date(data_from_django[i]['time']),
-                    value: +data_from_django[i]['price']
-                    });
-                } 
-                drawChart(data);   
+                var data = parseData({{prices |safe}})
+                drawChart(data, ".line-chart");   
             </script>
         </svg>
         <div class="hero-foot">

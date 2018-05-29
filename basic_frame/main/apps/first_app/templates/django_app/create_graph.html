@@ -5,12 +5,39 @@
                 {% load static %}
                 <meta charset="utf-8">
                 <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
+                <link rel="stylesheet" type="text/css" href="{% static 'django_app/css/bulma/css/bulma.css' %}">
+                <link rel="stylesheet" type="text/css" href="{% static 'django_app/css/bulma/css/main.css' %}">
             </head>
             
             <body>
                 <div class='wrapper'>
                     <p>This page is the user's create graph page. Data includes which coin(s) they wish to analyze, a chosen date range for the analysis, and the function the user wishes to apply (such as correlation or anything else statistical). For an advanced, we would display the results dynamically of any function the user potentially create.</p>
                     <p>This page will post to the user's graphs page</p>
+                    <form method = 'post' action = '/graphs/analyze/1'>
+                        {% csrf_token %}
+                        <select name = 'x_coin'> <!-- X axis coin -->
+                            <option value = '1'>Bitcoin</option>
+                            <option value = '825'>Tether</option>
+                        </select>
+                        <select name = 'x_key'> <!-- X axis key-->
+                            <option value = 'time'>Time</option>
+                            <option value = 'price'>Price</option>
+                        </select>
+                        <select name = 'y_coin'> <!-- Y axis coin-->
+                            <option value = '1'>Bitcoin</option>
+                            <option value = '825'>Tether</option>                        
+                        </select>
+                        <select name = 'y_key'> <!-- Y axis key-->
+                            <option value = 'time'>Time</option>
+                            <option value = 'price'>Price</option>
+                        </select>
+                        <input class="input" type="date" name="start"> <!-- beginning date -->
+                        <input class="input" type="date" name="end"> <!-- end date of analysis -->
+                        <select name = 'stat_func'> <!-- function -->
+                            <option value = 'plot'>Plot</option>
+                        </select>
+                        <button class = 'logout'>Make Plot</button>
+                    </form>
                     <a href = "/users/{{user_id}}">Back to Your Graphs</a>
                     <a href = "/graphs">Homepage</a>
                 </div>

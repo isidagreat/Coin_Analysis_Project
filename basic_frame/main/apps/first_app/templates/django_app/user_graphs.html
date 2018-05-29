@@ -20,8 +20,11 @@
         {% endfor %} {% endif %}
         {% for i in iterator %}
         <div class = 'graphbox'>
-            <img src = "{% static 'django_app\img' %}\exampleplot{{i}}.svg"  alt = "{% static 'django_app\img' %}/whitesquare.png">
+            <img src = "{% static 'django_app\img' %}\examplebcplot{{i}}.svg"  alt = "{% static 'django_app\img' %}/whitesquare.png">
             <form action = '/graphs/analyze/{{i}}'>
+                <button>Add Graph</button>
+            </form>
+            <form action = '/graphs/analyze/{{i}}/delete'>
                 <button>Add Graph</button>
             </form>
         </div>
