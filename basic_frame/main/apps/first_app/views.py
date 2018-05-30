@@ -163,8 +163,8 @@ def dashboard(request):
         return redirect('/users/login_page')
     context = {
         'user' : users.objects.get(id = str(user_id)),
-        #'coin1': json.dumps(data[:]),
-        #'coin2': json.dumps(data2[:]),
+        'coin1': json.dumps(data[:]),
+        'coin2': json.dumps(data2[:]),
     }
     print (context)
     return render(request, "django_app/coin_graphs_homepage.html", context)
