@@ -13,7 +13,7 @@ import json
 import requests
 import simplejson as json
 from statsmodels.formula.api import ols
-from .write_json import *
+from .write_json import * #dont need anymore
 from .datetimecalculation import * #sids custom function
 from .erikdatetimecalc import * #erik's custom function built on sids
 
@@ -182,22 +182,34 @@ def plot(request, graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmo
     if request.method == 'POST':
         user_id = str(request.session['user_id'])
         graph = int(graph_id)
+        
+        coin_x = coin_zero(request.POST['x_coin']) #processes which coin and gives appropriate variables
+        coin_y = coin_zero(request.POST['y_coin'])
+        x_zero = coin_x[0]
+        y_zero = coin_y[0]
+        
+        range_is_different = range_equalizer(x_zero, y_zero) #validator for lower range of coin
 
-        start = request.POST['start']
-        print('FORM::',start)
-        timestamp1 = datetime.strptime(start, "%Y-%m-%d")
-        print('STAMP1::',timestamp1)
-        end = request.POST['end']
-        timestamp2 = datetime.strptime(end, "%Y-%m-%d")
-        #print('STAMP2::',timestamp2)
-        diff = (timestamp1 - timestamp2)
-        numDays = diff.days
+        timestamp1 = unix_time(datetime.strptime(request.POST['start'], "%Y-%m-%d"))
+        timestamp2 = unix_time(datetime.strptime(request.POST['end'], "%Y-%m-%d"))
 
-        coin1_array = coinHistory(int(request.POST['x_coin']),50,1000)
-        coin2_array = coinHistory(int(request.POST['y_coin']),50,1000)
+        x_key = key_validation(request.POST['x_key'],'price')
+        y_key = key_validation(request.POST['y_key'],'time')
+
+        x_name = coin_x[1] + ' ' + x_key
+        y_name = coin_y[1] + ' ' + y_key
+
+        coin1_array = coinHistory(int(request.POST['x_coin']),timestamp1,timestamp2, x_zero)
+        coin2_array = coinHistory(int(request.POST['y_coin']),timestamp1,timestamp2, y_zero)
+
+        apply = request.POST['stat_func']
+
         if coin1_array != False and coin2_array != False: 
-            # x= axis(coin1_array, 'price')
-            # y= axis(coin2_array, 'price')
+            x = axis(coin1_array, x_key)
+            y = axis(coin2_array, y_key)
+            this_user = user.get(id = int(user_id))
+            this_plot = plot.objects.create(x_axis = x, y_axis = y, x_label = x_name, y_label = y_name, function = apply, user = this_user)
+            #will plot in render
             # plotarr = [x,y] #2d array for plotting
             # fig = plt.figure(figsize=(3,2))
             # plt.plot(plotarr[0],plotarr[1])
@@ -216,6 +228,34 @@ def axis(array,key_str): #this function searches a passed in array for the key_s
     for obj in array:
         axis_var.append(obj[key_str])
     return axis_var
+
+def key_validation(key, default):
+    if key != 'time' or key != 'price':
+        key = default
+    return key
+
+def coin_zero(coin_id):
+    if coin_id == '825':
+        zero = 1424871266 #Tether Zero Time Unix
+        name = 'Tether'
+    elif coin_id == '1':
+        zero = 1367174841 #Bitcoin Zero Time Unix
+        name = 'BitCoin'
+    else:
+        zero = 1367174841
+        name = 'BitCoin'
+    output = [zero,name]
+    return output
+
+def range_equalizer(coin1,coin2): #true means function executed
+    if coin1 < coin2: #this function makes sure the stats are analyzing the same range
+        coin1 = coin2 #it will shorten the range to the latest created coin's first measurement
+        return True
+    elif coin2 < coin1:
+        coin2 = coin1
+        return True
+    else: #they are equal
+        return False
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
@@ -243,7 +283,7 @@ def coin(request, id,begin,end):
     }
     return render(request, "django_app/coin_page.html", context)
 
-def dateRange(request,id):
+def dateRange(request,id): #dont need anymore
     start = request.POST['start']
     print (start)
     timestamp1= mktime(datetime.strptime(start, "%Y-%m-%d").timetuple())

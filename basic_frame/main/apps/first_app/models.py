@@ -86,6 +86,18 @@ class users(models.Model):
     def __repr__(self):
         return "<user object: name: {} {} email: {}".format(self.fname, self.lname, self.email)
 
+class plot(models.Model):
+    x_axis = models.BigIntegerField()
+    x_label = models.CharField(max_length = 255)
+    y_axis = models.BigIntegerField()
+    y_label = models.CharField(max_length = 255)
+    function = models.CharField(max_length = 255)
+    user = ForeignKey(users, related_name = 'plots')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __repr__(self):
+        return "<plot object: X: {} {} Y: {} {} function applied: {}".format(self.x_label, self.x_axis,self.y_label, self.y_axis, self.function)
+        
 class coin(models.Model):
     requestID = models.IntegerField() #ID for requesting the API
     name = models.CharField(max_length=255)

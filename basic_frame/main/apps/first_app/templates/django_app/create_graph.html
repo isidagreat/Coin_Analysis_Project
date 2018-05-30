@@ -15,24 +15,31 @@
                     <p>This page will post to the user's graphs page</p>
                     <form method = 'post' action = '/graphs/analyze/1'>
                         {% csrf_token %}
+                        <p>X-axis Coin</p>
                         <select name = 'x_coin'> <!-- X axis coin -->
                             <option value = '1'>Bitcoin</option>
                             <option value = '825'>Tether</option>
                         </select>
+                        <p>X-axis label</p>
                         <select name = 'x_key'> <!-- X axis key-->
                             <option value = 'time'>Time</option>
                             <option value = 'price'>Price</option>
                         </select>
+                        <p>Y-axis Coin</p>
                         <select name = 'y_coin'> <!-- Y axis coin-->
                             <option value = '1'>Bitcoin</option>
                             <option value = '825'>Tether</option>                        
                         </select>
+                        <p>Y-Axis Label</p>
                         <select name = 'y_key'> <!-- Y axis key-->
                             <option value = 'time'>Time</option>
                             <option value = 'price'>Price</option>
                         </select>
+                        <p>Beginning Date</p>
                         <input class="input" type="date" name="start"> <!-- beginning date -->
+                        <p>Ending Date</p>
                         <input class="input" type="date" name="end"> <!-- end date of analysis -->
+                        <p>Applied Function:</p>
                         <select name = 'stat_func'> <!-- function -->
                             <option value = 'plot'>Plot</option>
                         </select>
