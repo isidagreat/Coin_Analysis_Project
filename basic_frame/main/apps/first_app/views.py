@@ -176,6 +176,14 @@ def edit_user(request):
     else:
         return redirect('/')
 
+def jsonView(request):
+    data = coinHist2('1', 0) 
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+def jsonViewT(request):
+    data = coinHist2('825', 0) 
+    return HttpResponse(json.dumps(data), content_type='application/json')    
+
 def dashboard(request):
     if request.session['user_id'] != -1:
         user_id = request.session['user_id']

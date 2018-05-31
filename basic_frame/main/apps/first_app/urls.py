@@ -10,6 +10,8 @@ urlpatterns = [
     url(r'^graphs/dashboard/(?P<user_id>\d+)$', views.graph_interface), #the page that shows the making a graph interface
     url(r'^coin/(?P<id>\d+)/(?P<begin>\d+)/(?P<end>\d+)$', views.coin),
     url(r'^coin/(?P<id>\d+)/custom$', views.dateRange), #template for coin page
+    url(r'^jss$', views.jsonView),
+    url(r'^jss2$', views.jsonViewT),
     #------POSTS------------
     url(r'^users/logout$', views.logout), #clears session
     url(r'^users/add$', views.create), #post create user
