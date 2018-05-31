@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
 from datetime import date, datetime, time
 from time import mktime
-from .models import users, coin
+from .models import users, coin, plots
 from django.contrib import messages
 import bcrypt, matplotlib, requests
 import pandas as pd
@@ -13,7 +13,11 @@ import json
 import requests
 import simplejson as json
 from statsmodels.formula.api import ols
-from .write_json import *
+from bokeh.plotting import figure
+from bokeh.embed import components
+from bokeh.models import ColumnDataSource
+from bokeh.util.browser import view
+from .write_json import * #dont need anymore
 from .datetimecalculation import * #sids custom function
 from .erikdatetimecalc import * #erik's custom function built on sids
 
@@ -95,11 +99,31 @@ def show(request, id): #success page
     if request.session['user_id'] != -1: #user is here
         this_user = users.objects.get(id = str(id))
         #print('SHOW::',this_user)
+        plots_api = plots.objects.all().filter(user = this_user) #plot database with information necessary for call
+        user_plots = []
+        numCalls = 0
+        if len(plots_api) > 0:
+            for call in plots_api: #build the plot with calls and build the data
+                if numCalls < 4: #only want to call four times max for each user
+                    numCalls += 1
+                    coin_x_call = coinHistory(call.x_coin_id,call.UNIX_begin,call.UNIX_end, call.UNIX_zero)
+                    coin_y_call = coinHistory(call.y_coin_id,call.UNIX_begin,call.UNIX_end, call.UNIX_zero)
+                    #call finished
+                    x = axis(coin_x_call, call.x_key) #build the axes
+                    y = axis(coin_y_call, call.y_key)
+                    #print('X_AXIS_ARRAY',len(x))
+                    #print('Y_AXIS_ARRAY',len(y))
+                    this_plot = {'x':x,'y':y,'function':call.function,'x_label': call.x_label, 'y_label': call.y_label}
+                    user_plots.append(this_plot)
+                else:
+                    break
+        
         context = {'ID' : this_user.id,
                     'full_name' : (this_user.fname + ' ' + this_user.lname),
                     'email' : this_user.email,
                     'created_at' : this_user.created_at,
-                    'iterator' : [1,2,3,4]
+                    'iterator' : [1,2,3,4],
+                    'plots' : user_plots,
                    }
         request.session['first_name'] = this_user.fname
         return render(request,"django_app/user_graphs.html", context)
@@ -152,6 +176,14 @@ def edit_user(request):
     else:
         return redirect('/')
 
+def jsonView(request):
+    data = coinHist2('1', 0) 
+    return HttpResponse(json.dumps(data), content_type='application/json')
+
+def jsonViewT(request):
+    data = coinHist2('825', 0) 
+    return HttpResponse(json.dumps(data), content_type='application/json')    
+
 def dashboard(request):
     if request.session['user_id'] != -1:
         user_id = request.session['user_id']
@@ -182,28 +214,39 @@ def plot(request, graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmo
     if request.method == 'POST':
         user_id = str(request.session['user_id'])
         graph = int(graph_id)
+        
+        coin_x = coin_zero(request.POST['x_coin']) #processes which coin and gives appropriate variables
+        coin_y = coin_zero(request.POST['y_coin'])
+        x_zero = coin_x[0]
+        y_zero = coin_y[0]
+        
+        range_is_different = range_equalizer(x_zero, y_zero) #validator for lower range of coin
 
-        start = request.POST['start']
-        print('FORM::',start)
-        timestamp1 = datetime.strptime(start, "%Y-%m-%d")
-        print('STAMP1::',timestamp1)
-        end = request.POST['end']
-        timestamp2 = datetime.strptime(end, "%Y-%m-%d")
-        #print('STAMP2::',timestamp2)
-        diff = (timestamp1 - timestamp2)
-        numDays = diff.days
+        timestamp1 = unix_time(datetime.strptime(request.POST['start'], "%Y-%m-%d"))
+        timestamp2 = unix_time(datetime.strptime(request.POST['end'], "%Y-%m-%d"))
 
-        coin1_array = coinHistory(int(request.POST['x_coin']),50,1000)
-        coin2_array = coinHistory(int(request.POST['y_coin']),50,1000)
+        x_key = key_validation(request.POST['x_key'],'price')
+        y_key = key_validation(request.POST['y_key'],'time')
+
+        x_name = coin_x[1] + ' ' + x_key
+        y_name = coin_y[1] + ' ' + y_key
+
+        if request.POST['stat_func'].isalpha() == True:
+            apply = request.POST['stat_func']
+        else:
+            apply = 'post'
+
         if coin1_array != False and coin2_array != False: 
-            # x= axis(coin1_array, 'price')
-            # y= axis(coin2_array, 'price')
+            this_user = users.objects.get(id = int(user_id))
+            this_plot = plots.objects.create(x_coin_id = coin_x[3], y_coin_id = coin_y[3],UNIX_begin = timestamp1, UNIX_end = timestamp2, UNIX_zero = x_zero, x_label = x_name, y_label = y_name, function = apply, user = this_user)
+            #will plot in render
             # plotarr = [x,y] #2d array for plotting
             # fig = plt.figure(figsize=(3,2))
             # plt.plot(plotarr[0],plotarr[1])
-            return redirect('/graphs/dashboard/'+user_id)
-        else:
             return redirect('/users/'+user_id)
+        else:
+            print('API REQUEST FAILED')
+            return redirect('/graphs/dashboard/'+user_id)
     else:
         return redirect('/users/'+user_id)
     #fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
@@ -216,6 +259,37 @@ def axis(array,key_str): #this function searches a passed in array for the key_s
     for obj in array:
         axis_var.append(obj[key_str])
     return axis_var
+
+def key_validation(key, default):
+    if key != 'time' or key != 'price':
+        key = default
+    return key
+
+def coin_zero(coin_id):
+    if coin_id == '825':
+        zero = 1424871266 #Tether Zero Time Unix
+        name = 'Tether'
+        ID = int(coin_id)
+    elif coin_id == '1':
+        zero = 1367174841 #Bitcoin Zero Time Unix
+        name = 'BitCoin'
+        ID = int(coin_id)
+    else:
+        zero = 1367174841
+        name = 'BitCoin'
+        ID = 1
+    output = [zero,name,ID]
+    return output
+
+def range_equalizer(coin1,coin2): #true means function executed
+    if coin1 < coin2: #this function makes sure the stats are analyzing the same range
+        coin1 = coin2 #it will shorten the range to the latest created coin's first measurement
+        return True
+    elif coin2 < coin1:
+        coin2 = coin1
+        return True
+    else: #they are equal
+        return False
 
 def like(request,user_id,quote_id):
     if request.method == 'POST':
@@ -243,7 +317,7 @@ def coin(request, id,begin,end):
     }
     return render(request, "django_app/coin_page.html", context)
 
-def dateRange(request,id):
+def dateRange(request,id): #dont need anymore
     start = request.POST['start']
     print (start)
     timestamp1= mktime(datetime.strptime(start, "%Y-%m-%d").timetuple())
