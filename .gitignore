@@ -2,4 +2,6 @@
 *.sqlite3
 migrations/
 settings.py
-.DS_STORE
+*.code-workspace
+*.DS_STORE
+
