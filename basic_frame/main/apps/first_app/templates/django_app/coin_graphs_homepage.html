@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         <title>Homepage</title>
         {% load static %}
@@ -26,8 +25,8 @@
                         <h4 class="subtitle"><a href = '/users/{{user.id}}'>Your Graphs</a></h4>
                         <a href ='/users/logout'><button class="button is-black">Logout</button></a>
                         <!-- <a href ='/users/logout'><button class="button is-black">Make A Graph</button></a> -->
-                        <a href ="" class="button is-black">Back to Your Graphs</a>
-                        <a href ="" class="button is-black">Make A Graph</a>
+                        <a href ="/users/2" class="button is-black">Back to Your Graphs</a>
+                        <a href ="/graphs/dashboard/2" class="button is-black">Make A Graph</a>
                     </div>
                 </div>  
             </section>
@@ -41,9 +40,9 @@
                 </div>
             </div>
         </div>
-        <h1 class="title">Bitcoin</h1>
+        <a href="/coin/1/0"><h1 class="title">Bitcoin</h1></a>
         <svg class="grph" width="960" height="500"></svg>
-        <h1 class="title">Tether</h1>
+        <a href="/coin/825/0"><h1 class="title">Tether</h1></a>
         <svg class="grphtwo" width="960" height="500"></svg>
 
         <script src="https://d3js.org/d3.v4.min.js"></script>
