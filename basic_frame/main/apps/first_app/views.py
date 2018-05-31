@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from time import gmtime, strftime
 from datetime import date, datetime, time
 from time import mktime
-from .models import users, coin
+from .models import users, coin, plots
 from django.contrib import messages
 import bcrypt, matplotlib, requests
 import pandas as pd
@@ -13,6 +13,10 @@ import json
 import requests
 import simplejson as json
 from statsmodels.formula.api import ols
+from bokeh.plotting import figure
+from bokeh.embed import components
+from bokeh.models import ColumnDataSource
+from bokeh.util.browser import view
 from .write_json import * #dont need anymore
 from .datetimecalculation import * #sids custom function
 from .erikdatetimecalc import * #erik's custom function built on sids
@@ -95,11 +99,31 @@ def show(request, id): #success page
     if request.session['user_id'] != -1: #user is here
         this_user = users.objects.get(id = str(id))
         #print('SHOW::',this_user)
+        plots_api = plots.objects.all().filter(user = this_user) #plot database with information necessary for call
+        user_plots = []
+        numCalls = 0
+        if len(plots_api) > 0:
+            for call in plots_api: #build the plot with calls and build the data
+                if numCalls < 4: #only want to call four times max for each user
+                    numCalls += 1
+                    coin_x_call = coinHistory(call.x_coin_id,call.UNIX_begin,call.UNIX_end, call.UNIX_zero)
+                    coin_y_call = coinHistory(call.y_coin_id,call.UNIX_begin,call.UNIX_end, call.UNIX_zero)
+                    #call finished
+                    x = axis(coin_x_call, call.x_key) #build the axes
+                    y = axis(coin_y_call, call.y_key)
+                    #print('X_AXIS_ARRAY',len(x))
+                    #print('Y_AXIS_ARRAY',len(y))
+                    this_plot = {'x':x,'y':y,'function':call.function,'x_label': call.x_label, 'y_label': call.y_label}
+                    user_plots.append(this_plot)
+                else:
+                    break
+        
         context = {'ID' : this_user.id,
                     'full_name' : (this_user.fname + ' ' + this_user.lname),
                     'email' : this_user.email,
                     'created_at' : this_user.created_at,
-                    'iterator' : [1,2,3,4]
+                    'iterator' : [1,2,3,4],
+                    'plots' : user_plots,
                    }
         request.session['first_name'] = this_user.fname
         return render(request,"django_app/user_graphs.html", context)
@@ -199,23 +223,22 @@ def plot(request, graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmo
         x_name = coin_x[1] + ' ' + x_key
         y_name = coin_y[1] + ' ' + y_key
 
-        coin1_array = coinHistory(int(request.POST['x_coin']),timestamp1,timestamp2, x_zero)
-        coin2_array = coinHistory(int(request.POST['y_coin']),timestamp1,timestamp2, y_zero)
-
-        apply = request.POST['stat_func']
+        if request.POST['stat_func'].isalpha() == True:
+            apply = request.POST['stat_func']
+        else:
+            apply = 'post'
 
         if coin1_array != False and coin2_array != False: 
-            x = axis(coin1_array, x_key)
-            y = axis(coin2_array, y_key)
-            this_user = user.get(id = int(user_id))
-            this_plot = plot.objects.create(x_axis = x, y_axis = y, x_label = x_name, y_label = y_name, function = apply, user = this_user)
+            this_user = users.objects.get(id = int(user_id))
+            this_plot = plots.objects.create(x_coin_id = coin_x[3], y_coin_id = coin_y[3],UNIX_begin = timestamp1, UNIX_end = timestamp2, UNIX_zero = x_zero, x_label = x_name, y_label = y_name, function = apply, user = this_user)
             #will plot in render
             # plotarr = [x,y] #2d array for plotting
             # fig = plt.figure(figsize=(3,2))
             # plt.plot(plotarr[0],plotarr[1])
-            return redirect('/graphs/dashboard/'+user_id)
-        else:
             return redirect('/users/'+user_id)
+        else:
+            print('API REQUEST FAILED')
+            return redirect('/graphs/dashboard/'+user_id)
     else:
         return redirect('/users/'+user_id)
     #fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
@@ -238,13 +261,16 @@ def coin_zero(coin_id):
     if coin_id == '825':
         zero = 1424871266 #Tether Zero Time Unix
         name = 'Tether'
+        ID = int(coin_id)
     elif coin_id == '1':
         zero = 1367174841 #Bitcoin Zero Time Unix
         name = 'BitCoin'
+        ID = int(coin_id)
     else:
         zero = 1367174841
         name = 'BitCoin'
-    output = [zero,name]
+        ID = 1
+    output = [zero,name,ID]
     return output
 
 def range_equalizer(coin1,coin2): #true means function executed

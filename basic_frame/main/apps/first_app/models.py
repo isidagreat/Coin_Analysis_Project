@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
-import re
+import re,json
 from importlib import import_module
 from django.conf import settings
 import bcrypt
@@ -86,13 +86,22 @@ class users(models.Model):
     def __repr__(self):
         return "<user object: name: {} {} email: {}".format(self.fname, self.lname, self.email)
 
-class plot(models.Model):
-    x_axis = models.BigIntegerField()
+class plots(models.Model):
+    #the five below attributes build the API call
+    x_coin_id = models.CharField(max_length=255)
+    y_coin_id = models.CharField(max_length=255)
+    UNIX_begin = models.BigIntegerField()
+    UNIX_end = models.BigIntegerField()
+    UNIX_zero = models.BigIntegerField()
+    #the key builds the axes of the plot
+    x_key = models.CharField(max_length = 255)
+    y_key = models.CharField(max_length = 255)
+    #The below is plot information for the plot
     x_label = models.CharField(max_length = 255)
-    y_axis = models.BigIntegerField()
     y_label = models.CharField(max_length = 255)
     function = models.CharField(max_length = 255)
-    user = ForeignKey(users, related_name = 'plots')
+    #the below is database information
+    user = models.ForeignKey(users, related_name = 'plots')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __repr__(self):
