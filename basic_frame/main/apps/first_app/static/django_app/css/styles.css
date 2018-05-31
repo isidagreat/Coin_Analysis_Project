@@ -6,6 +6,9 @@
     text-align:center;
 }
 /*This is the start of the webpage*/
+.graph {
+    display: inline-block;
+}
 h6{
     color:darkred;
 }
