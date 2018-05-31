@@ -3,3 +3,5 @@
 migrations/
 settings.py
 *.code-workspace
+*.DS_STORE
+

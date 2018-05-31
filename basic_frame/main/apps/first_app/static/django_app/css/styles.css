@@ -6,9 +6,13 @@
     text-align:center;
 }
 /*This is the start of the webpage*/
-.graph {
-    display: inline-block;
-}
+
+
+/* .creategraph { */
+    /* width: 45%; */
+    /* height: 45%; */
+    /* background-color: white; */
+/* } */
 h6{
     color:darkred;
 }
