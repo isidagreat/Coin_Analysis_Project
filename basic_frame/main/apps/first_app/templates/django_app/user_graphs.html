@@ -5,30 +5,45 @@
     {% load static %}
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.13.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.13.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.13.min.css" rel="stylesheet" type="text/css">
+
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.13.min.js"></script>
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.13.min.js"></script>
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.13.min.js"></script>
 </head>
 
 <body>
     <div class='wrapper'>
         <h3>{{full_name}}'s Graphs</h3>
-        <p>This page will list out all the user's graphs and allow the user to post any graph to social media. There will also be a button to make a graph, which redirects to the make a graph page.</p>
-        <p>This page will have any of the user's saved graphs or analyses they did in the past. Perhaps this page will have any of their followed coin graphs.</p>
+        <p>This page will list out all the user's graphs and allow the user to post any graph to social media. There will also
+            be a button to make a graph, which redirects to the make a graph page.</p>
+        <p>This page will have any of the user's saved graphs or analyses they did in the past. Perhaps this page will have
+            any of their followed coin graphs.</p>
         <p>Your Email: {{email}}</p>
         <p>Your ID: {{ID}}</p>
         <p>Account Creation: {{created_at}}</p>
         {% if messages %} {% for message in messages %}
         <h6>{{message}}</h6>
         {% endfor %} {% endif %}
-        {% for i in iterator %}
-        <div class = 'graphbox'>
-            <img src = "{% static 'django_app\img' %}\examplebcplot{{i}}.svg"  alt = "{% static 'django_app\img' %}/whitesquare.png">
-            <form action = '/graphs/analyze/{{i}}'>
+        <p>My Plots:</p>
+        <p>{{plots}}</p>
+        <p>{{plots1}}</p>
+        {% if plots %} {% for plot in plots %}
+        <p>New Plot!!</p>
+        <p>{{plot.id}}</p>
+        {% endfor %} {% endif %} {% if 1 == 2 %} {% for i in iterator %}
+        <div class='graphbox'>
+            <img src="{% static 'django_app\img' %}\examplebcplot{{i}}.svg" alt="{% static 'django_app\img' %}/whitesquare.png">
+            <form action='/graphs/analyze/{{i}}'>
                 <button>Add Graph</button>
             </form>
-            <form action = '/graphs/analyze/{{i}}/delete'>
+            <form action='/graphs/analyze/{{i}}/delete'>
                 <button>Add Graph</button>
             </form>
         </div>
-        {% endfor %}
+        {% endfor %} {% endif %}
         <form action='/graphs'>
             <button class='logout' type='submit'>Homepage</button>
         </form>
@@ -38,7 +53,9 @@
         <form action='/users/logout'>
             <button class='logout' type='submit'>Logout</button>
         </form>
-        <a href = "/graphs/dashboard/{{ID}}"><button>Make A graph</button></a>
+        <a href="/graphs/dashboard/{{ID}}">
+            <button>Make A graph</button>
+        </a>
     </div>
 </body>
 
