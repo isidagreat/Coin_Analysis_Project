@@ -5,13 +5,16 @@
     {% load static %}
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
-    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.13.min.css" rel="stylesheet" type="text/css">
-    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.13.min.css" rel="stylesheet" type="text/css">
-    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.13.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.16.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.16.min.css" rel="stylesheet" type="text/css">
 
-    <script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.13.min.js"></script>
-    <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.13.min.js"></script>
-    <script src="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.13.min.js"></script>
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-0.12.16.min.js"></script>
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.12.16.min.js"></script>
+    <script src="https://cdn.pydata.org/bokeh/release/bokeh-tables-0.12.16.min.js"></script>
+    {% autoescape off %}
+    {{ script }}
+    {% endautoescape %}
 </head>
 
 <body>
@@ -27,12 +30,11 @@
         {% if messages %} {% for message in messages %}
         <h6>{{message}}</h6>
         {% endfor %} {% endif %}
-        <p>My Plots:</p>
-        <p>{{plots}}</p>
-        <p>{{plots1}}</p>
         {% if plots %} {% for plot in plots %}
         <p>New Plot!!</p>
-        <p>{{plot.id}}</p>
+        {% autoescape off %}
+        {{ plot }}
+        {% endautoescape %}
         {% endfor %} {% endif %} {% if 1 == 2 %} {% for i in iterator %}
         <div class='graphbox'>
             <img src="{% static 'django_app\img' %}\examplebcplot{{i}}.svg" alt="{% static 'django_app\img' %}/whitesquare.png">

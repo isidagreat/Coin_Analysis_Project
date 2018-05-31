@@ -105,7 +105,7 @@ class plots(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __repr__(self):
-        return "<plot object: X: {} {} Y: {} {} function applied: {}".format(self.x_label, self.x_axis,self.y_label, self.y_axis, self.function)
+        return "<plot object: X: "
         
 class coin(models.Model):
     requestID = models.IntegerField() #ID for requesting the API
