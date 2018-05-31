@@ -17,7 +17,6 @@ from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource
 from bokeh.util.browser import view
-from .write_json import * #dont need anymore
 from .datetimecalculation import * #sids custom function
 from .erikdatetimecalc import * #erik's custom function built on sids
 
@@ -306,10 +305,10 @@ def graph_interface(request,user_id):
     }
     return render(request, 'django_app/create_graph.html', context)
   
-def coin(request, id,begin,end):
+def coin(request, id,time):
     # call coinHist function
-    #data = coinHist(id, time)
-    data = coinHistory(id,begin, end)
+    data = coinHist(id, time)
+    # data = coinHist(id)
     if data == False:
         return redirect("/graphs")
     info = requests.get("https://api.coinmarketcap.com/v2/ticker/"+id)
@@ -402,10 +401,7 @@ def get_coin_data(coin_id): #this function pulls the api data and returns it in 
     print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
     #call each element with datePrice[i].time or datePrice[i].price
     return datePrice
-<<<<<<< HEAD
 
 
     
 
-=======
->>>>>>> 00f7b6339581e2cdda39978b6e7a8cb5adf8e289
