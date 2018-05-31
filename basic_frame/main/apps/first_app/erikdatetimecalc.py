@@ -1,11 +1,13 @@
 import requests
 from datetime import date, datetime
 def coinHistory(id,begin_time, end_time, zero_time): #begin, end, and zero time should be unix timestamp INTEGERS
-    max_time = unix_time(datetime.utcnow()) #current time
+    max_time = int(unix_time(datetime.utcnow())) #current time
     #zero_time validation
     if type(zero_time) !=  type(1):
+        print('ZERO TIME BAD INPUT::',zero_time)
         return False
     elif zero_time > begin_time or zero_time > end_time: #must be less than both
+        print('INVALID ZERO TIME::', zero_time)
         return False
     else:
         pass
@@ -37,13 +39,15 @@ def coinHistory(id,begin_time, end_time, zero_time): #begin, end, and zero time 
         URL = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"+str(begin_time)+"/"+str(end_time)+"/"
     else:
         URL = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"+str(begin_time)+"/"+str(end_time)+"/"
-
+    print('TIMES::', begin_time,end_time)
     # Create GET request to API
     response = requests.get(URL)
-    if response.status_code != requests.code.ok: #checks if get was successful
+    if response.status_code != 200: #checks if get was successful
+        print('BAD CODE::',response.status_code)
         return False
     # Translate to JSON
     data = response.json()
+    print('JSON_LENGTH::', len(data))
     # Storing date and price into Object List
     max_len = int(len(data['price_usd']))
     datePrice = []
@@ -52,8 +56,9 @@ def coinHistory(id,begin_time, end_time, zero_time): #begin, end, and zero time 
         price = data['price_usd'][i][1]
         datePrice.append({'time': time,'price': price})
         # return the objectList
+    print('ARRAY LENGTH::',len(datePrice))
     return datePrice
 
 def unix_time(dt):
-    epoch = datetime.datetime.utcfromtimestamp(0)
+    epoch = datetime.utcfromtimestamp(0)
     return (dt - epoch).total_seconds() * 1000
