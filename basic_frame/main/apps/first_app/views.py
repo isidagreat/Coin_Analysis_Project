@@ -102,28 +102,33 @@ def show(request, id): #success page
         plots_api = plots.objects.all().filter(user = this_user) #plot database with information necessary for call
         user_plots = []
         numCalls = 0
+        print(plots_api, len(plots_api))
         if len(plots_api) > 0:
             for call in plots_api: #build the plot with calls and build the data
                 if numCalls < 4: #only want to call four times max for each user
                     numCalls += 1
+                    title = "Plot " + str(numCalls)
                     coin_x_call = coinHistory(call.x_coin_id,call.UNIX_begin,call.UNIX_end, call.UNIX_zero)
                     coin_y_call = coinHistory(call.y_coin_id,call.UNIX_begin,call.UNIX_end, call.UNIX_zero)
                     #call finished
+                    print(call)
                     x = axis(coin_x_call, call.x_key) #build the axes
                     y = axis(coin_y_call, call.y_key)
                     #print('X_AXIS_ARRAY',len(x))
                     #print('Y_AXIS_ARRAY',len(y))
-                    this_plot = {'x':x,'y':y,'function':call.function,'x_label': call.x_label, 'y_label': call.y_label}
-                    user_plots.append(this_plot)
+                    this_figure = figure(title = title,plot_width = 400, plot_height = 400,x_axis_label = call.x_label, y_axis_label = call.y_label) #build the figure
+                    this_figure.scatter(x,y,size = 8,color = 'blue', alpha=1) #scatterplot
+                    user_plots.append(this_figure) #append to figure array
                 else:
                     break
-        
+        script, myPlots = components(user_plots)
         context = {'ID' : this_user.id,
                     'full_name' : (this_user.fname + ' ' + this_user.lname),
                     'email' : this_user.email,
                     'created_at' : this_user.created_at,
                     'iterator' : [1,2,3,4],
-                    'plots' : user_plots,
+                    'plots' : myPlots,
+                    'script' : script
                    }
         request.session['first_name'] = this_user.fname
         return render(request,"django_app/user_graphs.html", context)
@@ -235,18 +240,16 @@ def plot(request, graph_id): #pd = pandas #np = numpy #matplotlib = plt #statsmo
             apply = request.POST['stat_func']
         else:
             apply = 'post'
-
-        if coin1_array != False and coin2_array != False: 
-            this_user = users.objects.get(id = int(user_id))
-            this_plot = plots.objects.create(x_coin_id = coin_x[3], y_coin_id = coin_y[3],UNIX_begin = timestamp1, UNIX_end = timestamp2, UNIX_zero = x_zero, x_label = x_name, y_label = y_name, function = apply, user = this_user)
-            #will plot in render
-            # plotarr = [x,y] #2d array for plotting
-            # fig = plt.figure(figsize=(3,2))
-            # plt.plot(plotarr[0],plotarr[1])
-            return redirect('/users/'+user_id)
-        else:
-            print('API REQUEST FAILED')
-            return redirect('/graphs/dashboard/'+user_id)
+        
+        this_user = users.objects.get(id = int(user_id))
+        # print(coin_x[2],coin_y[2])
+        # print(timestamp1,timestamp2,x_zero)
+        # print(x_name,y_name,apply, this_user)
+        this_plot = plots.objects.create(x_coin_id = coin_x[2], y_coin_id = coin_y[2],UNIX_begin = timestamp1,x_key=x_key, y_key = y_key, UNIX_end = timestamp2, UNIX_zero = x_zero, x_label = x_name, y_label = y_name, function = apply, user = this_user)
+        return redirect('/users/'+user_id)
+        # else:
+        #     print('API REQUEST FAILED')
+        #     return redirect('/graphs/dashboard/'+user_id)
     else:
         return redirect('/users/'+user_id)
     #fig.savefig('./apps/first_app/static/django_app/img/examplebcplot' + str(graph_id) +'.svg', bbox_inches='tight') #saves the file to img folder
