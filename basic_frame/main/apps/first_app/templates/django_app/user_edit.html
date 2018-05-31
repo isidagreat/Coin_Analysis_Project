@@ -1,59 +1,76 @@
+<!DOCTYPE html>
 <html>
-
-<head>
-    <title>Mellon</title>
-    {% load static %}
-    <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
-</head>
-
-<body>
-    <div class='wrapper'>
-        <h3>Edit Your Account</h3>
-        <form action='/users/edit' method='POST'>
-            {% csrf_token %}
-            <p> This page should be given more functionality to allow linking to social media, as well as change password and delete account</p>
-            <div class='entry_field'>
-                <h5>First Name:</h5>
-                {% if messages %}
-                {% for msg in messages %}
-                {% if msg.level == 1 %}
-                <h6>{{msg}}</h6>
-                {% endif %}
-                {% endfor %} {% endif %} 
-                <input type='text' name='first_name' value = '{{first_name}}'>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- style sheet for the font Awesome css from bootstrap, below.To start using bulma-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.css">
+        <title>Mellon</title>
+        {% load static %}
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="{% static 'django_app/css/bulma/css/bulma.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'django_app/css/bulma/css/main.css' %}">
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="{% static 'django_app/javascript/coin_page.js' %}"></script>
+    </head>
+    <body class="has-background-link"> 
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="container">
+            <div class="block">
+                <div class="box">
+                    <form action="/users/edit" method="POST">
+                        {% csrf_token %}
+                        <h3 class="title">Edit Your Account</h3>
+                        <label class="label">First Name</label>
+                        {% if messages %}
+                        {% for msg in messages %}
+                        {% if msg.level == 1 %}
+                        <h6>{{msg}}</h6>
+                        {% endif %}
+                        {% endfor %} {% endif %} 
+                        <input type="text" class="input" name="first_name" value = '{{first_name}}' placeholder="First Name">
+                        
+                        <label class="label">Last Name</label>
+                        {% if messages %} 
+                        {% for msg in messages %}
+                        {% if msg.level == 2 %}
+                        <h6>{{msg}}</h6>
+                        {% endif %}
+                        {% endfor %} {% endif %}
+                        <input type="text" class="input" name="last_name" value = '{{last_name}}' placeholder="Last Name">
+                        
+                        <label class="label">Email</label>
+                        {% if messages %} 
+                        {% for msg in messages %}
+                        {% if msg.level == 3 %}
+                        <h6>{{msg}}</h6>
+                        {% endif %}
+                        {% endfor %} {% endif %} 
+                        <input type="text" class="input" name="email" value = '{{email}}' placeholder="Email">
+                        <input type = 'hidden' name = 'id' value = '{{ID}}'>
+                        <button type = 'submit' class='button is-link'>Update</button>
+                    </form>
+                </div>
             </div>
-            <div class='entry_field'>
-                <h5>Last Name:</h5>
-                {% if messages %} 
-                {% for msg in messages %}
-                {% if msg.level == 2 %}
-                <h6>{{msg}}</h6>
-                {% endif %}
-                {% endfor %} {% endif %} 
-                <input type='text' name='last_name' value = '{{last_name}}'>
-            </div>
-            <div class='entry_field'>
-                <h5>Email:</h5>
-                {% if messages %} 
-                {% for msg in messages %}
-                {% if msg.level == 3 %}
-                <h6>{{msg}}</h6>
-                {% endif %}
-                {% endfor %} {% endif %} 
-                <input type='text' name='email' value = '{{email}}'>
-            </div>
-            <input type = 'hidden' name = 'id' value = '{{ID}}'>
-            <button type = 'submit' class = 'logout'>Update</button>
-        </form>
-        <form action='/users/logout'>
-            <button class='logout' type='submit'>Logout</button>
-        </form>
-        <form action='/users/{{ID}}'>
-            <button class='logout' type='submit'>Back to Your Page</button>
-        </form>
-    </div>
-    </div>
-</body>
-
+        </div>
+        <div>
+            <form action='/users/logout'>
+                <button class='button is-link' type='submit'>Logout</button>
+            </form>
+            <form action='/users/{{ID}}'>
+                <button class='button is-link' type='submit'>Back to Your Page</button>
+            </form>
+        </div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+    </body>
 </html>

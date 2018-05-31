@@ -1,37 +1,86 @@
+<!DOCTYPE html>
 <html>
-
-<head>
-    {% load static %}
-    <title>Login Page</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'django_app\css\styles.css' %}">
-</head>
-
-<body>
-    <div class='wrapper'>
-        <h2>Login Here</h2>
-        <p>This page should be given more style. As a team we should decide on a distinctive style associated with this app.</p>
-        <form action='/users/login' class='login' method='POST'>
-        {% csrf_token %}    
-            <p>Email:</p>
-            <input type='text' name='email'>
-            {% if messages %}
-                {% for msg in messages %}
-                {% if msg.level == 1 %}
-                <h6>{{msg}}</h6>
-                {% endif %}
-                {% endfor %} {% endif %} 
-            <p>Password:</p>
-            <input type='text' name='password'>
-            {% if messages %}
-                {% for msg in messages %}
-                {% if msg.level == 2 %}
-                <h6>{{msg}}</h6>
-                {% endif %}
-                {% endfor %} {% endif %} 
-            <button class= 'logout' type = 'submit'>Log In</button>
-        </form>
-        <a href = '/'><button class = 'logout'>Create Account</button></a>
-    </div>
-</body>
-
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- style sheet for the font Awesome css from bootstrap, below.To start using bulma-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.4.2/css/bulma.css">
+        {% load static %}
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="{% static 'django_app/css/bulma/css/bulma.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'django_app/css/bulma/css/main.css' %}">
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="{% static 'django_app/javascript/coin_page.js' %}"></script>
+        <title>Login</title>
+    </head>
+    <body class="has-background-link">
+        <div class="container">
+            <div class="notification is-link">
+            </div>
+            <div class="notification is-link"></div>
+            <div class="notification is-link"></div>
+            <div class="block">
+                <div class="box">
+                    <form action='/users/login' class='login' method='POST'>
+                        {% csrf_token %}
+                        <h1 class="title">Login</h1>
+                        <h2 class="subtitle">Welcome Back!</h2>
+                        <div class="field">
+                            {% if messages %}
+                                {% for msg in messages %}
+                                    {% if msg.level == 1 %}
+                                    <h6>{{msg}}</h6>
+                                    {% endif %}
+                            {% endfor %} {% endif %}
+                            <label class="label">Email</label>
+                            <input type="text" name="email" class="input" placeholder="Enter Name">
+                        </div>
+                        <div class="field">
+                            {% if messages %}
+                                {% for msg in messages %}
+                                    {% if msg.level == 2 %}
+                                    <h6>{{msg}}</h6>
+                                    {% endif %}
+                            {% endfor %} {% endif %}
+                            <label class="label">Password</label>
+                            <input type="password" class="input" name="password" placeholder="Enter Name">
+                            <button class="button-is-info">Submit!</button>
+                        </div>
+                        <nav class="nav">
+                            <div class="nav-left">
+                                <a href="" class="nav-item">
+                                    <h1 class="title is-4">Coin Analysis</h1>
+                                </a>
+                            </div>
+                            <div class="nav-center">
+                                <a href="" class="nav-item">
+                                <span class="icon">
+                                    <i class="fa fa-github"></i>
+                                </span>
+                                </a>
+                                <a href="" class="nav-item">
+                                <span class="icon">
+                                    <i class="fa fa-twitter"></i>
+                                </span>
+                                </a>
+                            </div>
+                            <div class="nav-right nav-menu">
+                                <a href="/" class="button is-info">Register with us!</a>
+                            </div>
+                        </nav>
+                    </form>
+                    <!-- <div class="notification is-link"></div>
+                    <div class="notification is-link"></div> -->
+                </div>        
+            </div>
+        </div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+        <div class="notification is-link"></div>
+    </body>
 </html>

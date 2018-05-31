@@ -362,3 +362,32 @@ def correlation(request):
     col1.corr(col2)
     return redirect('/graph')
 
+
+def get_coin_data(coin_id): #this function pulls the api data and returns it in an array 
+    #later on we will abstract the time range that we want as well
+    #1 for bitcoin, 2 for tether
+    # API endpoint
+    #coin_id = int(coin_id)
+    if coin_id == 2: #its tether
+        coin_name = 'tether'
+        URL = "https://api.coinmarketcap.com/v2/ticker/825"
+        URL2 = 'https://graphs2.coinmarketcap.com/currencies/tether/'
+    else: #its bitcoin
+        coin_name = 'bitcoin'
+        URL = "https://api.coinmarketcap.com/v2/ticker/1"
+        URL2 = "https://graphs2.coinmarketcap.com/currencies/bitcoin/"
+    # Create GET request to API
+    response2 = requests.get(URL2)
+    response = requests.get(URL)
+    # Translate to JSON
+    data = response.json()
+    mark = response2.json()
+    # Storing date and price into variables
+    datePrice = []
+    for i in range(0,400):
+        time = datetime.fromtimestamp(int((mark['price_usd'][i][0])/1000)).strftime('%Y-%m-%d')
+        price = mark['price_usd'][i][1]
+        datePrice.append({'time': time,'price': price})
+    print('DATEPRICE ARRAY:: ', coin_name, datePrice) #returns an array of objects with keys time and price
+    #call each element with datePrice[i].time or datePrice[i].price
+    return datePrice
